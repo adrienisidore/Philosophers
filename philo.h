@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/11 12:17:56 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/11 12:24:38 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ typedef struct s_philo
 }   t_philo;
 
 //error.c
-int ft_parser(int ac, char **av);
+void ft_parser(int ac, char **av);
 
 //utils.c
 size_t	ft_strlen(const char *str);

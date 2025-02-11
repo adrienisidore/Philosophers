@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:44 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/11 11:44:02 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/11 12:24:32 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static void    ft_checkint(const char *str)
         ft_error(FORBID_PARAM);
 }
 
-int ft_parser(int ac, char **av)
+void ft_parser(int ac, char **av)
 {
     int i;
     
