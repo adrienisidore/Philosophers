@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/11 11:41:01 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/11 12:17:56 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <stdio.h>//printf (useless en temps normal)
 # include <unistd.h>//write
 # include <stdlib.h>//exit, size_t
+# include <pthread.h>
 
 # define R_SYNTAX        "Correct syntax: ./philo number_of_philosophers time_to_die "
 # define INV_ARG         "Invalid argument(s): "
@@ -24,6 +25,15 @@
 # define LARGE_PARAM     INV_ARG "No argument can exceed XXX miliseconds\n"
 # define FORBID_PARAM    INV_ARG "positive numbers required\n"
 # define TMANY_PHILO     INV_ARG "number_of_philosophers must be between 1 and 200\n"
+
+typedef struct s_philo
+{
+    int     idx;
+    size_t  t_die;
+    size_t  t_eat;
+    size_t  t_sleep;
+    size_t  t_think;
+}   t_philo;
 
 //error.c
 int ft_parser(int ac, char **av);
