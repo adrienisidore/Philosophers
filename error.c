@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:44 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/11 12:24:32 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/12 12:32:44 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ static void    ft_checkint(const char *str)
     while (ft_isnum(str[i]))
         i++;
     //Si i est trop grand alors on refuse : ca protege de l'overflow de itoa
-    //On peut ensuite préciser au cas par cas dans ft_parser
+    //On peut ensuite préciser au cas par cas dans ft_parser.
+    //Askip il faut aller jusqu'a l'INT_MAX forcement
     if (i >= 7)
        ft_error(LARGE_PARAM); 
     while (ft_ispace(str[i]))
