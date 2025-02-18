@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/18 13:56:19 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/18 15:44:10 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,10 @@
 //un noeud par philo
 typedef struct s_philo
 {
-    int     idx;
+    int             idx;
+    pthread_t		thread;
+    pthread_mutex_t	*r_fork;
+	pthread_mutex_t	*l_fork;
     //ptr vers les mutex 
 }   t_philo;
 
