@@ -6,13 +6,13 @@
 #    By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/11 11:40:55 by aisidore          #+#    #+#              #
-#    Updated: 2025/02/11 12:19:26 by aisidore         ###   ########.fr        #
+#    Updated: 2025/02/18 12:23:01 by aisidore         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRC = main.c \
 	  utils.c \
-	  error.c
+	  parsing.c
 
 OBJ = $(SRC:.c=.o)
 

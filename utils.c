@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:04 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/11 12:12:00 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/18 13:55:50 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,11 @@ size_t	ft_strlen(const char *str)
 	return (i);
 }
 
-int	ft_atoi(const char *str)
+long int	ft_atol(const char *str)
 {
-	int	i;
-	int	sign;
-	int	r;
+	int			i;
+	int			sign;
+	long int	r;
 
 	i = 0;
 	sign = 1;
@@ -59,6 +59,8 @@ int	ft_atoi(const char *str)
 	{
 			r = r * 10 + str[i] - '0';
 			i++;
+			if (r > INT_MAX)
+				ft_error(INV_ARG);
 	}
 	return (r * sign);
 }

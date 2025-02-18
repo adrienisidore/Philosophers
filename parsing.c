@@ -1,45 +1,44 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:44 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/12 12:32:44 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/18 13:55:44 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static void    ft_error(char *to_write)
-{
-    write(2, to_write, ft_strlen(to_write));
-    exit(1);
-}
-
 static void    ft_checkint(const char *str)
 {
-    int i;
+    int         i;
+    int         j;
 
     i = 0;
     while (ft_ispace(str[i]))
         i++;
     if (!(ft_isnum(str[i]) || str[i] == '+'))
-        ft_error(FORBID_PARAM);
+        ft_error(INV_ARG);
     if (str[i] == '+')
         i++;
+    j = 0;
     while (ft_isnum(str[i]))
+    {
         i++;
-    //Si i est trop grand alors on refuse : ca protege de l'overflow de itoa
-    //On peut ensuite préciser au cas par cas dans ft_parser.
-    //Askip il faut aller jusqu'a l'INT_MAX forcement
-    if (i >= 7)
-       ft_error(LARGE_PARAM); 
+        j++;   
+    }
+    if (j > 10)
+       ft_error(INV_ARG); //INT_MIN = -2 147 483 648       INT_MAX = 2 147 483 647
     while (ft_ispace(str[i]))
         i++;
     if (str[i])
-        ft_error(FORBID_PARAM);
+        ft_error(INV_ARG);
+    //Peut on mettre certains param a 0 ?
+    if (!ft_atol(str))
+        ft_error(INV_ARG);  
 }
 
 void ft_parser(int ac, char **av)
@@ -51,7 +50,7 @@ void ft_parser(int ac, char **av)
     i = 0;
     while (av[++i])
         ft_checkint(av[i]);
-    //Quelle limitation mettre pour les autres params ?
-    if (ft_atoi(av[1]) < 1 || ft_atoi(av[1]) > 200)
+    //Quelle(s) limitation(s) mettre pour les autres params ?
+    if (ft_atol(av[1]) < 1 || ft_atol(av[1]) > 200)
         ft_error(TMANY_PHILO);
 }

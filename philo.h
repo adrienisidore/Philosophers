@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/12 12:52:30 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/18 13:56:19 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,14 @@
 # include <unistd.h>//write
 # include <stdlib.h>//exit, size_t
 # include <pthread.h>
+# include <limits.h>
 
-# define R_SYNTAX        "Correct syntax: ./philo number_of_philosophers time_to_die "
-# define INV_ARG         "Invalid argument(s): "
+# define R_SYNTAX        "philo: Correct syntax: ./philo number_of_philosophers time_to_die "
 # define PARAM_ERROR     R_SYNTAX "time_to_eat time_to_sleep" PARAM_OPT
 # define PARAM_OPT       " [number_of_times_each_philosopher_must_eat]\n"
-# define LARGE_PARAM     INV_ARG "No argument can exceed XXX miliseconds\n"
-# define FORBID_PARAM    INV_ARG "positive numbers required\n"
-# define TMANY_PHILO     INV_ARG "number_of_philosophers must be between 1 and 200\n"
+# define INV_ARG         "philo: Invalid argument(s)" INV_ARG_MORE
+# define INV_ARG_MORE    ", enter valid arguments between 1 and 2 147 483 647ms\n"
+# define TMANY_PHILO     "philo: number_of_philosophers must be between 1 and 200\n"
 
 //un noeud par philo
 typedef struct s_philo
@@ -36,13 +36,12 @@ typedef struct s_philo
 //structure data recupere av + pointeur vers liste chainee des philos
 typedef struct s_data
 {
-    int     idx;
     size_t  t_die;
     size_t  t_eat;
     size_t  t_sleep;
     size_t  t_think;
     size_t  many_eat;
-    t_philo philos;
+    t_philo *philos;
 }   t_data;
 
 //fourchettes = mutex : 2 necessaires pour manger
@@ -54,14 +53,16 @@ typedef struct s_data
 //1 philo = 1 thread qui fait des actions => 1 idx, et des pointeurs vers les mutex de la structure generale
 //1 boucle infini qui va lancer tous les thread et les exec, jusqu'a ce que 1 meurt
 
+//main.c
+void        ft_error(char *to_write);
 
-//error.c
-void ft_parser(int ac, char **av);
+//parsing.c
+void        ft_parser(int ac, char **av);
 
 //utils.c
-size_t	ft_strlen(const char *str);
-int     ft_atoi(const char *str);
-int     ft_isnum(const char c);
-int     ft_ispace(const char c);
+size_t	    ft_strlen(const char *str);
+int         ft_isnum(const char c);
+int         ft_ispace(const char c);
+long int	ft_atol(const char *str);
 
 #endif
