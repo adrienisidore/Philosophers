@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/19 17:53:46 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/19 18:18:32 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,10 @@
 
 //penser au cas ou y'a 1 seul philo
 
-// -no-pie
-
 //gcc -S main.c utils.c parsing.c : obtenir le comportement CPU (Code Vault : What are race conditions ? 10min)
 //Peu d'iteration ne pose pas de pb car le 2eme thread n'a pas le temps d'etre cree avant
 //que le premier finisse son iteration
 
-//-no-pie ajoute pour eviter message d'erreur
 
 //Quand je cree un thread c'est pour executer une fonction.
 //Pour creer un thread il faut creer une variable qui va contenir l'info que l'API thread renvoie :
@@ -62,6 +59,9 @@ void    *ft_thread(void *arg)
 }
 void    ft_initdt(t_data *dt, int ac, char **av)
 {
+    // pthread_t   *th;
+    
+    dt->nphilo = ft_atol(av[1]);
     dt->t_die = ft_atol(av[2]);
     dt->t_die = ft_atol(av[3]);
     dt->t_sleep = ft_atol(av[4]);
@@ -70,21 +70,45 @@ void    ft_initdt(t_data *dt, int ac, char **av)
         dt->many_eat = ft_atol(av[5]);
     else
         dt->many_eat = -1;
-    dt->philos = malloc(sizeof(t_data) * ft_atol(av[1]));
+    dt->philos = malloc(sizeof(t_data) * dt->nphilo);
+    if (!dt->philos)
+    {
+        free(dt);
+        ft_error("philo: Memory allocation failed\n");
+    }
+    // th = malloc(sizeof(pthread_t))
+}
+
+void    ft_initphilos(t_data *dt)
+{
+    long    i;
+
+    i = 1;
+    while (i <= dt->nphilo)
+    {
+        dt->philos->idx = i;
+        dt->philos->dt = dt;
+        i++;
+    }
+    //Si un seul create_thread foire il faut free dt etc...
+    
 }
 
 t_data  *ft_init(int ac, char **av)
 {
     t_data      *dt;
 
-    (void)ac;
-    (void)av;
     dt = malloc(sizeof(t_data));
     if (!dt)
         ft_error("philo: Memory allocation failed\n");
-    // ft_initdt(dt, ac, av);
+    ft_initdt(dt, ac, av);
+    ft_initphilos(dt);
     return (dt);
 }
+// void    ft_wait()
+// {
+
+// }
 
 int main(int ac, char **av)
 {
@@ -93,12 +117,10 @@ int main(int ac, char **av)
     pthread_mutex_t mut;//locker
     t_data          *dt;
 
-    // ft_parser(ac, av);
     dt = ft_init(ac, ft_parser(ac, av));
     //Il faudra free aussi tous les philos a l'interieur
     
 
-    // //Je crois qu'il faut creer/detruire autant de mutex qu'il y a de philos
     //NULL : des param useless pour nous
     pthread_mutex_init(&mut, NULL);
     
@@ -106,7 +128,7 @@ int main(int ac, char **av)
     //1er NULL : set up les parametres par defaut. En dernier argument c'est les arguments que
     //ft_thread recquiert pour fonctionner. De base on avait mis NULL mais ca oblige a declarer mut en variable globale
     if (pthread_create(&t1, NULL, &ft_thread, &mut))
-        ft_error("philo: Thread creation failed\n");
+        ft_error("philo: Thread creation failed\n");//il faut free aussi le tableau
     if (pthread_create(&t2, NULL, &ft_thread, &mut))
         ft_error("philo: Thread creation failed\n");
 
@@ -117,13 +139,12 @@ int main(int ac, char **av)
     if (pthread_join(t2, NULL))
         ft_error("philo: Thread connexion failed\n");
 
-    // //Je crois qu'il faut creer/detruire autant de mutex qu'il y a de philos
     pthread_mutex_destroy(&mut);
 
     //Le resultat joint de plusieurs threads se situera apres les pthread_join
     printf("mail = %d\n", mail);
 
-
+    free(dt->philos);
     free(dt);
     return (0);
 }

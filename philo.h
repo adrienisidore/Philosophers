@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/19 17:37:36 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/19 18:03:11 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct s_philo
 //structure data recupere av + pointeur vers liste chainee des philos
 typedef struct s_data
 {
+    long  nphilo;
     long  t_die;
     long  t_eat;
     long  t_sleep;
