@@ -6,14 +6,14 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/18 15:44:10 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/19 12:58:39 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
-# include <stdio.h>//printf (useless en temps normal)
+//# include <stdio.h>//printf (useless en temps normal)
 # include <unistd.h>//write
 # include <stdlib.h>//exit, size_t
 # include <pthread.h>
@@ -26,6 +26,8 @@
 # define INV_ARG_MORE    ", enter valid arguments between 1 and 2 147 483 647ms\n"
 # define TMANY_PHILO     "philo: number_of_philosophers must be between 1 and 200\n"
 
+typedef struct s_data t_data;
+
 //un noeud par philo
 typedef struct s_philo
 {
@@ -33,6 +35,7 @@ typedef struct s_philo
     pthread_t		thread;
     pthread_mutex_t	*r_fork;
 	pthread_mutex_t	*l_fork;
+    t_data          *dt;
     //ptr vers les mutex 
 }   t_philo;
 

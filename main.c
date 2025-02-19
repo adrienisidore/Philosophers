@@ -6,11 +6,13 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/18 17:18:59 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/19 12:59:55 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+// -no-pie
 
 //gcc -S main.c utils.c parsing.c : obtenir le comportement CPU (Code Vault : What are race conditions ? 10min)
 //Peu d'iteration ne pose pas de pb car le 2eme thread n'a pas le temps d'etre cree avant
@@ -30,13 +32,14 @@
 
 void    ft_error(char *to_write)
 {
-    write(2, to_write, ft_strlen(to_write));
+    if (to_write)
+        write(2, to_write, ft_strlen(to_write));
     exit(1);
 }
 
 void    *ft_thread()
 {
-    printf("Test from threads\n");
+    write(1, "Test from threads\n", 19);
     return (NULL);
 }
 
@@ -88,8 +91,7 @@ int main(int ac, char **av)
     // // tout ce qu'il y a entre les 2 ne sera execute
     // // que par 1 thread.
     // // pthread_mutex_unlock(&mut);//ouvre le locker
-    // printf("Hello World\n");
-    // printf("int max %d int min %d\n", INT_MAX, INT_MIN);
+    // write(1, "Hello World\n", 13);
 
     // //Je crois qu'il faut creer/detruire autant de mutex qu'il y a de philos
     pthread_mutex_destroy(&mut);

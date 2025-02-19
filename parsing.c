@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:44 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/18 13:55:44 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/19 12:53:56 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ static void    ft_checkint(const char *str)
     if (str[i])
         ft_error(INV_ARG);
     //Peut on mettre certains param a 0 ?
-    if (!ft_atol(str))
+    if (!ft_atol(str))//lancer ft_atol ici permet aussi de verifier qu'on depasse pas l'INT MAX
         ft_error(INV_ARG);  
 }
 
@@ -51,6 +51,7 @@ void ft_parser(int ac, char **av)
     while (av[++i])
         ft_checkint(av[i]);
     //Quelle(s) limitation(s) mettre pour les autres params ?
-    if (ft_atol(av[1]) < 1 || ft_atol(av[1]) > 200)
-        ft_error(TMANY_PHILO);
+    if (ft_atol(av[1]) < 1 || ft_atol(av[1]) > 200)//
+        ft_error(TMANY_PHILO);//
+    //ASKIP 60 ms minimum pour mourrir dans la correction
 }
