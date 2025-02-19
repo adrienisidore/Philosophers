@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/19 17:46:28 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:53:46 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ void    ft_initdt(t_data *dt, int ac, char **av)
         dt->many_eat = ft_atol(av[5]);
     else
         dt->many_eat = -1;
+    dt->philos = malloc(sizeof(t_data) * ft_atol(av[1]));
 }
 
 t_data  *ft_init(int ac, char **av)
