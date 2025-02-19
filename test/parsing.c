@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:44 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/19 17:37:21 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:39:42 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static void    ft_checkint(const char *str)
         j++;   
     }
     if (j > 10)
-       ft_error(INV_ARG); //INT_MIN = -2 147 483 648       INT_MAX = 2 147 483 647
+    ft_error(INV_ARG); //INT_MIN = -2 147 483 648       INT_MAX = 2 147 483 647
     while (ft_ispace(str[i]))
         i++;
     if (str[i])
@@ -41,7 +41,7 @@ static void    ft_checkint(const char *str)
         ft_error(INV_ARG);  
 }
 
-char **ft_parser(int ac, char **av)
+void ft_parser(int ac, char **av)
 {
     int i;
     
@@ -54,6 +54,4 @@ char **ft_parser(int ac, char **av)
     if (ft_atol(av[1]) < 1 || ft_atol(av[1]) > 200)//
         ft_error(TMANY_PHILO);//
     //ASKIP 60 ms minimum pour mourrir dans la correction
-
-    return (av);
 }

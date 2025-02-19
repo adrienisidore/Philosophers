@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/19 17:37:36 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:57:09 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,11 @@ typedef struct s_philo
 //structure data recupere av + pointeur vers liste chainee des philos
 typedef struct s_data
 {
-    long  t_die;
-    long  t_eat;
-    long  t_sleep;
-    long  t_think;
-    long  many_eat;
+    int     t_die;
+    int     t_eat;
+    int     t_sleep;
+    int     t_think;
+    int     many_eat;
     t_philo *philos;
 }   t_data;
 
@@ -63,7 +63,7 @@ typedef struct s_data
 void        ft_error(char *to_write);
 
 //parsing.c
-char        **ft_parser(int ac, char **av);
+void        ft_parser(int ac, char **av);
 
 //utils.c
 size_t	    ft_strlen(const char *str);
