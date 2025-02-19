@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/19 18:03:11 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/19 19:01:43 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 # define INV_ARG         "philo: Invalid argument(s)" INV_ARG_MORE
 # define INV_ARG_MORE    ", enter valid arguments between 1 and 2 147 483 647ms\n"
 # define TMANY_PHILO     "philo: number_of_philosophers must be between 1 and 200\n"
+# define MEM_FAIL        "philo: Memory allocation failed\n"
 
 typedef struct s_data t_data;
 
@@ -42,6 +43,7 @@ typedef struct s_philo
 //structure data recupere av + pointeur vers liste chainee des philos
 typedef struct s_data
 {
+    pthread_mutex_t *mut;//tableau contenant tous les mutex a l'initialisation
     long  nphilo;
     long  t_die;
     long  t_eat;

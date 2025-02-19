@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/19 18:18:32 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/19 19:03:59 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,26 +40,27 @@ void    ft_error(char *to_write)
 
 void    *ft_thread(void *arg)
 {
-    pthread_mutex_t *ptr_mut;
+    t_data          *dt;
     int             i;
 
     //On recupere le mutex et on protege la data
-    ptr_mut = (pthread_mutex_t *)arg;
+    dt = (t_data *)arg;
 
     i = 0;
-    pthread_mutex_lock(ptr_mut);
     write(1, "Test from threads\n", 19);
     while (i < 1000000)
     {
+        pthread_mutex_lock(dt->mut);
         mail++;
+        pthread_mutex_unlock(dt->mut);
         i++;
     }
-    pthread_mutex_unlock(ptr_mut);
     return (NULL);
 }
 void    ft_initdt(t_data *dt, int ac, char **av)
 {
     // pthread_t   *th;
+    
     
     dt->nphilo = ft_atol(av[1]);
     dt->t_die = ft_atol(av[2]);
@@ -73,6 +74,8 @@ void    ft_initdt(t_data *dt, int ac, char **av)
     dt->philos = malloc(sizeof(t_data) * dt->nphilo);
     if (!dt->philos)
     {
+        pthread_mutex_destroy(dt->mut);
+        free(dt->mut);
         free(dt);
         ft_error("philo: Memory allocation failed\n");
     }
@@ -101,8 +104,16 @@ t_data  *ft_init(int ac, char **av)
     dt = malloc(sizeof(t_data));
     if (!dt)
         ft_error("philo: Memory allocation failed\n");
-    ft_initdt(dt, ac, av);
-    ft_initphilos(dt);
+    dt->mut = malloc(sizeof(pthread_mutex_t));
+    if (!dt->mut)
+    {
+        free(dt);
+        ft_error("philo: Memory allocation failed\n");
+    }
+    pthread_mutex_init(dt->mut, NULL);//Dans le cas ou je cree 1 seul mutex, situe dans dt
+    //A FAIRE A FAIRE
+    ft_initdt(dt, ac, av);//tout ce qui n'est pas du malloc
+    ft_initphilos(dt);//idem pour les
     return (dt);
 }
 // void    ft_wait()
@@ -114,22 +125,17 @@ int main(int ac, char **av)
 {
     pthread_t       t1;
     pthread_t       t2;
-    pthread_mutex_t mut;//locker
     t_data          *dt;
 
     dt = ft_init(ac, ft_parser(ac, av));
     //Il faudra free aussi tous les philos a l'interieur
     
-
-    //NULL : des param useless pour nous
-    pthread_mutex_init(&mut, NULL);
-    
     //Connexion entre l'API thread et la fonction qu'elle va executer :
     //1er NULL : set up les parametres par defaut. En dernier argument c'est les arguments que
     //ft_thread recquiert pour fonctionner. De base on avait mis NULL mais ca oblige a declarer mut en variable globale
-    if (pthread_create(&t1, NULL, &ft_thread, &mut))
+    if (pthread_create(&t1, NULL, &ft_thread, dt))
         ft_error("philo: Thread creation failed\n");//il faut free aussi le tableau
-    if (pthread_create(&t2, NULL, &ft_thread, &mut))
+    if (pthread_create(&t2, NULL, &ft_thread, dt))
         ft_error("philo: Thread creation failed\n");
 
     //L'equivalent de wait() pour les threads :
@@ -139,11 +145,12 @@ int main(int ac, char **av)
     if (pthread_join(t2, NULL))
         ft_error("philo: Thread connexion failed\n");
 
-    pthread_mutex_destroy(&mut);
+    pthread_mutex_destroy(dt->mut);
 
     //Le resultat joint de plusieurs threads se situera apres les pthread_join
     printf("mail = %d\n", mail);
 
+    free(dt->mut);
     free(dt->philos);
     free(dt);
     return (0);
