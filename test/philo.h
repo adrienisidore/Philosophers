@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/19 14:57:09 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/20 16:36:24 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,13 @@
 # define INV_ARG         "philo: Invalid argument(s)" INV_ARG_MORE
 # define INV_ARG_MORE    ", enter valid arguments between 1 and 2 147 483 647ms\n"
 # define TMANY_PHILO     "philo: number_of_philosophers must be between 1 and 200\n"
-
+# define MEM_FAIL        "philo: Memory allocation failed\n"
+# define MUT_FAIL        "philo: Mutex initialisation failed\n"
+# define TH_FAIL         "philo: Thread creation failed\n"
+# define THC_FAIL         "philo: Thread connexion failed\n"
 typedef struct s_data t_data;
 
-//un noeud par philo
+//on cree un tableau contigu de philos les uns a cote des autres != liste chainee
 typedef struct s_philo
 {
     int             idx;
@@ -42,11 +45,14 @@ typedef struct s_philo
 //structure data recupere av + pointeur vers liste chainee des philos
 typedef struct s_data
 {
-    int     t_die;
-    int     t_eat;
-    int     t_sleep;
-    int     t_think;
-    int     many_eat;
+    pthread_mutex_t *mut;//tableau contenant tous les mutex a l'initialisation
+    //Faire la meme chose pour les threads ?
+    long  nphilo;
+    long  t_die;
+    long  t_eat;
+    long  t_sleep;
+    long  t_think;
+    long  many_eat;
     t_philo *philos;
 }   t_data;
 
@@ -60,10 +66,10 @@ typedef struct s_data
 //1 boucle infini qui va lancer tous les thread et les exec, jusqu'a ce que 1 meurt
 
 //main.c
-void        ft_error(char *to_write);
+void        ft_exit(char *to_write);
 
 //parsing.c
-void        ft_parser(int ac, char **av);
+char        **ft_parser(int ac, char **av);
 
 //utils.c
 size_t	    ft_strlen(const char *str);

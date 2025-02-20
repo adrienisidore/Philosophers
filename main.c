@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/20 16:37:36 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/20 17:29:21 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,16 +136,11 @@ t_data  *ft_init(int ac, char **av)
 
 // }
 
-//Faire une fonction qui fait peter les malloc, les pthread create et les pthread_join
-int main(int ac, char **av)
+void    ft_inithreads(t_data *dt)
 {
-    pthread_t       t1;
-    pthread_t       t2;
-    t_data          *dt;
+    pthread_t   t1;
+    pthread_t   t2;
 
-    dt = ft_init(ac, ft_parser(ac, av));
-    //Il faudra free aussi tous les philos a l'interieur
-    
     //Connexion entre l'API thread et la fonction qu'elle va executer :
     //1er NULL : set up les parametres par defaut. En dernier argument c'est les arguments que
     //ft_thread recquiert pour fonctionner. De base on avait mis NULL mais ca oblige a declarer mut en variable globale
@@ -168,6 +163,17 @@ int main(int ac, char **av)
         
     if (pthread_join(t2, NULL))
         ft_freeall(dt, dt->mut, dt->philos, THC_FAIL);
+}
+
+//Faire une fonction qui fait peter les malloc, les pthread create et les pthread_join
+int main(int ac, char **av)
+{
+    t_data          *dt;
+
+    dt = ft_init(ac, ft_parser(ac, av));
+    
+    ft_inithreads(dt);
+
     //On detruit le mutex une seule fois, meme si les threads ont echoue a join ou autre.
     //Comme ca aucun risque de le detruire plusieurs fois.
     pthread_mutex_destroy(dt->mut);//ft_destroy pour detruire tous les mutex
