@@ -6,7 +6,7 @@
 #    By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/11 11:40:55 by aisidore          #+#    #+#              #
-#    Updated: 2025/02/19 19:04:33 by aisidore         ###   ########.fr        #
+#    Updated: 2025/02/20 13:03:17 by aisidore         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,8 +20,8 @@ OBJ = $(OBJ_DIR)/main.o \
 	  $(OBJ_DIR)/utils.o \
 	  $(OBJ_DIR)/parsing.o
 
-FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
-#FL = -Wall -Wextra -Werror -pthread
+# FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
+FL = -Wall -Wextra -Werror
 
 all: philo
 

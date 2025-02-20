@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/19 19:03:59 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/20 13:04:31 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ void    *ft_thread(void *arg)
     //On recupere le mutex et on protege la data
     dt = (t_data *)arg;
 
+    //i est une variable locale, chaque CPU en  une copie
     i = 0;
     write(1, "Test from threads\n", 19);
     while (i < 1000000)
@@ -71,15 +72,6 @@ void    ft_initdt(t_data *dt, int ac, char **av)
         dt->many_eat = ft_atol(av[5]);
     else
         dt->many_eat = -1;
-    dt->philos = malloc(sizeof(t_data) * dt->nphilo);
-    if (!dt->philos)
-    {
-        pthread_mutex_destroy(dt->mut);
-        free(dt->mut);
-        free(dt);
-        ft_error("philo: Memory allocation failed\n");
-    }
-    // th = malloc(sizeof(pthread_t))
 }
 
 void    ft_initphilos(t_data *dt)
@@ -97,6 +89,15 @@ void    ft_initphilos(t_data *dt)
     
 }
 
+void    ft_freeall(t_data *dt, pthread_mutex_t *dt_mut)
+{
+    if (dt_mut)
+        free(dt_mut);//Quand y'en aura pleins on fera une boucle
+    if (dt)
+        free(dt);
+    ft_error("philo: Memory allocation failed\n");
+}
+
 t_data  *ft_init(int ac, char **av)
 {
     t_data      *dt;
@@ -104,16 +105,16 @@ t_data  *ft_init(int ac, char **av)
     dt = malloc(sizeof(t_data));
     if (!dt)
         ft_error("philo: Memory allocation failed\n");
-    dt->mut = malloc(sizeof(pthread_mutex_t));
+    ft_initdt(dt, ac, av);//tout ce qui n'est pas du malloc s'init ici
+    dt->mut = malloc(sizeof(pthread_mutex_t));//Ici on initialise qu'un seul mutex
     if (!dt->mut)
-    {
-        free(dt);
-        ft_error("philo: Memory allocation failed\n");
-    }
-    pthread_mutex_init(dt->mut, NULL);//Dans le cas ou je cree 1 seul mutex, situe dans dt
-    //A FAIRE A FAIRE
-    ft_initdt(dt, ac, av);//tout ce qui n'est pas du malloc
-    ft_initphilos(dt);//idem pour les
+        ft_freeall(dt, NULL);
+    dt->philos = malloc(sizeof(t_philo) * dt->nphilo);
+    if (!dt->philos)
+        ft_freeall(dt, dt->mut);
+    //MALLOC autant de mutex qu'il y a de fourchettes (philos). MALLOC autant de thread qu'il y a de philos + 1 monitor
+    pthread_mutex_init(dt->mut, NULL);//Dans le cas ou je cree 1 seul mutex.
+    ft_initphilos(dt);//pas de malloc ici donc pas besoin de free
     return (dt);
 }
 // void    ft_wait()
@@ -121,6 +122,7 @@ t_data  *ft_init(int ac, char **av)
 
 // }
 
+//Faire une fonction qui fait peter les malloc, les pthread create et les pthread_join
 int main(int ac, char **av)
 {
     pthread_t       t1;
