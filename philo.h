@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/19 19:01:43 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/20 16:23:36 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@
 # define INV_ARG_MORE    ", enter valid arguments between 1 and 2 147 483 647ms\n"
 # define TMANY_PHILO     "philo: number_of_philosophers must be between 1 and 200\n"
 # define MEM_FAIL        "philo: Memory allocation failed\n"
-
+# define MUT_FAIL        "philo: Mutex initialisation failed\n"
+# define TH_FAIL         "philo: Thread creation failed\n"
+# define THC_FAIL         "philo: Thread connexion failed\n"
 typedef struct s_data t_data;
 
 //un noeud par philo
@@ -44,6 +46,7 @@ typedef struct s_philo
 typedef struct s_data
 {
     pthread_mutex_t *mut;//tableau contenant tous les mutex a l'initialisation
+    //Faire la meme chose pour les threads ?
     long  nphilo;
     long  t_die;
     long  t_eat;
@@ -63,7 +66,7 @@ typedef struct s_data
 //1 boucle infini qui va lancer tous les thread et les exec, jusqu'a ce que 1 meurt
 
 //main.c
-void        ft_error(char *to_write);
+void        ft_exit(char *to_write);
 
 //parsing.c
 char        **ft_parser(int ac, char **av);

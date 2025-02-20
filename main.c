@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/20 13:09:23 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/20 16:29:25 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,16 @@
 
 int mail = 0;
 
-void    ft_error(char *to_write)
+void    ft_exit(char *to_write)
 {
     if (to_write)
+    {
         write(2, to_write, ft_strlen(to_write));
-    exit(1);
+        exit(1);
+    }   
+    //L'exit code doit il changer en fonction de ce qui pete ?
+    exit(0);
+    
 }
 
 void    *ft_thread(void *arg)
@@ -66,7 +71,7 @@ void    ft_initdt(t_data *dt, int ac, char **av)
     
     dt->nphilo = ft_atol(av[1]);
     dt->t_die = ft_atol(av[2]);
-    dt->t_die = ft_atol(av[3]);
+    dt->t_eat = ft_atol(av[3]);
     dt->t_sleep = ft_atol(av[4]);
     // dt->t_think non initialise
     if (ac == 6)
@@ -79,24 +84,30 @@ void    ft_initphilos(t_data *dt)
 {
     long    i;
 
-    i = 1;
-    while (i <= dt->nphilo)
+    i = 0;
+    while (i < dt->nphilo) // Correction : `i` commence à 0 et va jusqu'à `nphilo - 1`
     {
-        dt->philos->idx = i;
-        dt->philos->dt = dt;
+        //avant j;ecrivais dt->philos->idx = i + 1; ce qui correspondait uniquement a l'indice du 1er philo
+        //qui etait constamment ecrase
+        dt->philos[i].idx = i + 1; // Assigner un identifiant unique (de 1 à nphilo)
+        dt->philos[i].dt = dt; // Associer chaque philosophe à la structure `dt`
         i++;
     }
-    //Si un seul create_thread foire il faut free dt etc...
-    
 }
 
-void    ft_freeall(t_data *dt, pthread_mutex_t *dt_mut)
+
+void    ft_freeall(t_data *dt, pthread_mutex_t *dt_mut, t_philo *dt_philos, char *str)
 {
+    if (dt_philos)
+        free(dt_philos);
     if (dt_mut)
         free(dt_mut);//Quand y'en aura pleins on fera une boucle
     if (dt)
         free(dt);
-    ft_error("philo: Memory allocation failed\n");
+    //si str : lancer ft_exit sans message (str = NULL alors exit 0)
+    if (str)
+        ft_exit(str);
+    ft_exit(NULL);
 }
 
 t_data  *ft_init(int ac, char **av)
@@ -105,16 +116,17 @@ t_data  *ft_init(int ac, char **av)
 
     dt = malloc(sizeof(t_data));
     if (!dt)
-        ft_error("philo: Memory allocation failed\n");
+        ft_exit(MEM_FAIL);
     ft_initdt(dt, ac, av);//tout ce qui n'est pas du malloc s'init ici
     dt->mut = malloc(sizeof(pthread_mutex_t));//Ici on initialise qu'un seul mutex
     if (!dt->mut)
-        ft_freeall(dt, NULL);
+        ft_freeall(dt, NULL, NULL, MEM_FAIL);
     dt->philos = malloc(sizeof(t_philo) * dt->nphilo);
     if (!dt->philos)
-        ft_freeall(dt, dt->mut);
+        ft_freeall(dt, dt->mut, NULL, MEM_FAIL);
     //MALLOC autant de mutex qu'il y a de fourchettes (philos). MALLOC autant de thread qu'il y a de philos + 1 monitor
-    pthread_mutex_init(dt->mut, NULL);//Dans le cas ou je cree 1 seul mutex.
+    if (pthread_mutex_init(dt->mut, NULL))
+        ft_freeall(dt, dt->mut, dt->philos, MUT_FAIL);//Dans le cas ou je cree 1 seul mutex.
     ft_initphilos(dt);//pas de malloc ici donc pas besoin de free
     return (dt);
 }
@@ -137,24 +149,31 @@ int main(int ac, char **av)
     //1er NULL : set up les parametres par defaut. En dernier argument c'est les arguments que
     //ft_thread recquiert pour fonctionner. De base on avait mis NULL mais ca oblige a declarer mut en variable globale
     if (pthread_create(&t1, NULL, &ft_thread, dt))
-        ft_error("philo: Thread creation failed\n");//il faut free aussi le tableau
+        ft_freeall(dt, dt->mut, dt->philos, TH_FAIL);
+        
     if (pthread_create(&t2, NULL, &ft_thread, dt))
-        ft_error("philo: Thread creation failed\n");
+    {
+        pthread_join(t1, NULL); // On attend au moins t1 avant d'arrêter
+        //meme s'il echoue on s'en fout car on a free et donc on peut
+        //lancer ft_exit.
+        ft_freeall(dt, dt->mut, dt->philos, TH_FAIL); 
+    }
 
     //L'equivalent de wait() pour les threads :
     //le 2eme argument permet de recuperer le resultat final du thread mais ici on renvoie un void
+    //join peut echouer UNIQUEMENT si le thread n'a jamais ete cree ou a deja ete attendu
     if (pthread_join(t1, NULL))
-        ft_error("philo: Thread connexion failed\n");
+        ft_freeall(dt, dt->mut, dt->philos, THC_FAIL);
+        
     if (pthread_join(t2, NULL))
-        ft_error("philo: Thread connexion failed\n");
-
-    pthread_mutex_destroy(dt->mut);
+        ft_freeall(dt, dt->mut, dt->philos, THC_FAIL);
+    //On detruit le mutex une seule fois, meme si les threads ont echoue a join ou autre.
+    //Comme ca aucun risque de le detruire plusieurs fois.
+    pthread_mutex_destroy(dt->mut);//ft_destroy pour detruire tous les mutex
 
     //Le resultat joint de plusieurs threads se situera apres les pthread_join
     printf("mail = %d\n", mail);
 
-    free(dt->mut);
-    free(dt->philos);
-    free(dt);
+    ft_freeall(dt, dt->mut, dt->philos, NULL);
     return (0);
 }
