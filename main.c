@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/20 13:04:31 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/20 13:09:23 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,9 @@ void    *ft_thread(void *arg)
     write(1, "Test from threads\n", 19);
     while (i < 1000000)
     {
-        pthread_mutex_lock(dt->mut);
+        pthread_mutex_lock(dt->mut);//Pour l'instant y'a qu'un seul mutex dans dt, et tous les threads l'utilisent pour incrementer mails
+        //On peut faire UNE PREMIERE SIMULATION OU ON FAIT ECRIRE CHAQUE PHILO SON IDENTIFIANT ET C TOUT (UN MUTEX WRITE).
+        //ILS VONT SUREMENT ECRIRE UN PEU DANS LE DESORDRE ?
         mail++;
         pthread_mutex_unlock(dt->mut);
         i++;
@@ -61,7 +63,6 @@ void    *ft_thread(void *arg)
 void    ft_initdt(t_data *dt, int ac, char **av)
 {
     // pthread_t   *th;
-    
     
     dt->nphilo = ft_atol(av[1]);
     dt->t_die = ft_atol(av[2]);
