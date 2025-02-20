@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/20 16:29:25 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/20 16:37:36 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,8 @@ t_data  *ft_init(int ac, char **av)
     //MALLOC autant de mutex qu'il y a de fourchettes (philos). MALLOC autant de thread qu'il y a de philos + 1 monitor
     if (pthread_mutex_init(dt->mut, NULL))
         ft_freeall(dt, dt->mut, dt->philos, MUT_FAIL);//Dans le cas ou je cree 1 seul mutex.
-    ft_initphilos(dt);//pas de malloc ici donc pas besoin de free
+    ft_initphilos(dt);//pas de malloc ici donc pas besoin de free. On a initialise les philos plus haut donc pas de risque de
+    //mauvias indexage. Ils sont ous deja pret a etre remplis ici.
     return (dt);
 }
 // void    ft_wait()

@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/20 16:23:36 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/20 16:36:24 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 # define THC_FAIL         "philo: Thread connexion failed\n"
 typedef struct s_data t_data;
 
-//un noeud par philo
+//on cree un tableau contigu de philos les uns a cote des autres != liste chainee
 typedef struct s_philo
 {
     int             idx;
