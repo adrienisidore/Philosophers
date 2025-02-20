@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/20 17:29:21 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/20 18:28:32 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ void    ft_exit(char *to_write)
     if (to_write)
     {
         write(2, to_write, ft_strlen(to_write));
+        //L'exit code doit il changer en fonction de ce qui pete ?
         exit(1);
     }   
     //L'exit code doit il changer en fonction de ce qui pete ?
@@ -87,7 +88,7 @@ void    ft_initphilos(t_data *dt)
     i = 0;
     while (i < dt->nphilo) // Correction : `i` commence à 0 et va jusqu'à `nphilo - 1`
     {
-        //avant j;ecrivais dt->philos->idx = i + 1; ce qui correspondait uniquement a l'indice du 1er philo
+        //avant j'ecrivais dt->philos->idx = i + 1; ce qui correspondait uniquement a l'indice du 1er philo
         //qui etait constamment ecrase
         dt->philos[i].idx = i + 1; // Assigner un identifiant unique (de 1 à nphilo)
         dt->philos[i].dt = dt; // Associer chaque philosophe à la structure `dt`
@@ -98,10 +99,17 @@ void    ft_initphilos(t_data *dt)
 
 void    ft_freeall(t_data *dt, pthread_mutex_t *dt_mut, t_philo *dt_philos, char *str)
 {
+    if (dt_mut)
+    {
+        //Si je fais appel a la fonction pour tout nettoyer c'est forcement qu'on est a un
+        //endroit critique ou il faut detruire le mutex (soit dans ft_init, soit ft_inithreads,
+        //soit a la fin du main). On creera plus tard ft_destroy pour detruire tous les mutex
+        if (dt && dt_mut && dt_philos)
+            pthread_mutex_destroy(dt->mut); 
+        free(dt_mut);//Quand y'en aura pleins on fera une boucle   
+    }
     if (dt_philos)
         free(dt_philos);
-    if (dt_mut)
-        free(dt_mut);//Quand y'en aura pleins on fera une boucle
     if (dt)
         free(dt);
     //si str : lancer ft_exit sans message (str = NULL alors exit 0)
@@ -136,33 +144,35 @@ t_data  *ft_init(int ac, char **av)
 
 // }
 
+//Demander a GPT si il voit des ameliorations niveau protection car j'ai un peu fait a la onegain,
+//Surtout pour join. Si un join foire mais que les suivants pourrait fonctionner (ex le 3eme sur 5 foire)
+//est ce que c'est bien protege ?
 void    ft_inithreads(t_data *dt)
 {
-    pthread_t   t1;
-    pthread_t   t2;
-
-    //Connexion entre l'API thread et la fonction qu'elle va executer :
-    //1er NULL : set up les parametres par defaut. En dernier argument c'est les arguments que
-    //ft_thread recquiert pour fonctionner. De base on avait mis NULL mais ca oblige a declarer mut en variable globale
-    if (pthread_create(&t1, NULL, &ft_thread, dt))
-        ft_freeall(dt, dt->mut, dt->philos, TH_FAIL);
-        
-    if (pthread_create(&t2, NULL, &ft_thread, dt))
+    pthread_t       *th;
+    int             i;
+    
+    th = malloc(sizeof(pthread_t) * dt->nphilo);
+    i = 0;
+    while (i < dt->nphilo)
     {
-        pthread_join(t1, NULL); // On attend au moins t1 avant d'arrêter
-        //meme s'il echoue on s'en fout car on a free et donc on peut
-        //lancer ft_exit.
-        ft_freeall(dt, dt->mut, dt->philos, TH_FAIL); 
+        if (pthread_create(&th[i], NULL, &ft_thread, dt))
+        {
+            while (--i >= 0)
+                pthread_join(dt->philos[i].thread, NULL);
+            ft_freeall(dt, dt->mut, dt->philos, TH_FAIL);
+        }
+        i++;
     }
-
-    //L'equivalent de wait() pour les threads :
-    //le 2eme argument permet de recuperer le resultat final du thread mais ici on renvoie un void
-    //join peut echouer UNIQUEMENT si le thread n'a jamais ete cree ou a deja ete attendu
-    if (pthread_join(t1, NULL))
-        ft_freeall(dt, dt->mut, dt->philos, THC_FAIL);
-        
-    if (pthread_join(t2, NULL))
-        ft_freeall(dt, dt->mut, dt->philos, THC_FAIL);
+    i = 0;
+    while (i < dt->nphilo)
+    {
+        if (pthread_join(th[i], NULL))
+            ft_freeall(dt, dt->mut, dt->philos, THC_FAIL);
+        i++;
+    }
+    free(th);//Ici pour le moment, mais peut etre useless plus tard
+    
 }
 
 //Faire une fonction qui fait peter les malloc, les pthread create et les pthread_join
@@ -174,9 +184,9 @@ int main(int ac, char **av)
     
     ft_inithreads(dt);
 
-    //On detruit le mutex une seule fois, meme si les threads ont echoue a join ou autre.
-    //Comme ca aucun risque de le detruire plusieurs fois.
-    pthread_mutex_destroy(dt->mut);//ft_destroy pour detruire tous les mutex
+    // //On detruit le mutex une seule fois, meme si les threads ont echoue a join ou autre.
+    // //Comme ca aucun risque de le detruire plusieurs fois.
+    // pthread_mutex_destroy(dt->mut);//ft_destroy pour detruire tous les mutex
 
     //Le resultat joint de plusieurs threads se situera apres les pthread_join
     printf("mail = %d\n", mail);

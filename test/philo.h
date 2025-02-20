@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/20 16:36:24 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/20 18:24:53 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@
 # define MEM_FAIL        "philo: Memory allocation failed\n"
 # define MUT_FAIL        "philo: Mutex initialisation failed\n"
 # define TH_FAIL         "philo: Thread creation failed\n"
-# define THC_FAIL         "philo: Thread connexion failed\n"
+# define THC_FAIL        "philo: Thread connexion failed\n"
+
 typedef struct s_data t_data;
 
 //on cree un tableau contigu de philos les uns a cote des autres != liste chainee
