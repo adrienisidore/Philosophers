@@ -5,12 +5,13 @@ Plutot que d envoyer "dt" on envoie en argument le philo en question
 et ensuite on empeche le thread en question d incrementer mail s il n a pas les 2 fourchettes.
 Cela requiert de mettre a jour le ft_inithreads (voir ci dessous)
 
+//ATTENTION SEGFAULT si je gere pas l_fork == NULL (il faut proteger avant de tester ce code)
+//Voir discussion chatGPT
 void    *ft_thread(void *arg)
 {
     t_philo *philo;
     int     i;
 
-    // Récupération du philosophe correspondant à ce thread
     philo = (t_philo *)arg;
 
     i = 0;
