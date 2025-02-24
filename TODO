@@ -1,0 +1,48 @@
+Afin que chaque philo puisse executer ft_thread en ne prenant plus en compte un seul mutex
+mais les deux mutex qui leur sert de fourchette, chqtGPT propose de modifier la fonction comme suit :
+
+Plutot que d envoyer "dt" on envoie en argument le philo en question
+et ensuite on empeche le thread en question d incrementer mail s il n a pas les 2 fourchettes.
+Cela requiert de mettre a jour le ft_inithreads (voir ci dessous)
+
+void    *ft_thread(void *arg)
+{
+    t_philo *philo;
+    int     i;
+
+    // Récupération du philosophe correspondant à ce thread
+    philo = (t_philo *)arg;
+
+    i = 0;
+    write(1, "Test from threads\n", 19);
+    while (i < 1000000)
+    {
+        pthread_mutex_lock(philo->r_fork);
+        pthread_mutex_lock(philo->l_fork);
+        mail++;
+        pthread_mutex_unlock(philo->l_fork);
+        pthread_mutex_unlock(philo->r_fork);
+        i++;
+    }
+    return (NULL);
+}
+
+
+Dans ft_inithreads on initialise en ecrivant :
+if (pthread_create(&th[i], NULL, &ft_thread, &dt->philos[i]))
+
+Avec cette correction, chaque thread utilise ses propres fourchettes et
+n'incrémente mail que s'il a bien verrouillé ses deux mutex (ASKIP)
+
+void ft_adjust_forks(t_data *dt)
+{
+    int i;
+
+    // Exemple : les philosophes impairs cèdent leur fourchette droite aux philosophes de gauche
+    i = 1;
+    while (i < dt->nphilo)
+    {
+        dt->philos[i].l_fork = dt->philos[i - 1].r_fork;
+        i += 2; // On saute un philosophe sur deux
+    }
+}

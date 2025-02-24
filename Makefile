@@ -21,8 +21,8 @@ OBJ = $(OBJ_DIR)/main.o \
 	  $(OBJ_DIR)/utils.o \
 	  $(OBJ_DIR)/parsing.o
 
-# FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
-FL = -Wall -Wextra -Werror
+FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
+#FL = -Wall -Wextra -Werror
 
 all: philo
 

@@ -48,6 +48,9 @@ typedef struct s_data
 {
     pthread_mutex_t *mut;//tableau contenant tous les mutex a l'initialisation
     //Faire la meme chose pour les threads ?
+
+    pthread_mutex_t *mut_fork;//On test juste l'initialisation des forks
+    //avec un autre tableau de mutex
     long  nphilo;
     long  t_die;
     long  t_eat;

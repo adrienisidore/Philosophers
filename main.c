@@ -60,6 +60,14 @@ void    *ft_thread(void *arg)
         pthread_mutex_lock(dt->mut);//Pour l'instant y'a qu'un seul mutex dans dt, et tous les threads l'utilisent pour incrementer mails
         //On peut faire UNE PREMIERE SIMULATION OU ON FAIT ECRIRE CHAQUE PHILO SON IDENTIFIANT ET C TOUT (UN MUTEX WRITE).
         //ILS VONT SUREMENT ECRIRE UN PEU DANS LE DESORDRE ?
+
+        //Si je veux bloquer la donnee avec 2 mutex (fourchettes droite et gauche) il me suffit
+        //d'ecrire les 2 mutex a la suite ?
+        //pthread_mutex_lock(dt->philos->r_fork);
+        //pthread_mutex_lock(dt->philos->l_fork);
+        //write(1, "I'm eating ...", 15);
+        //pthread_mutex_unlock(dt->philos->r_fork);
+        //pthread_mutex_unlock(dt->philos->l_fork);
         mail++;
         pthread_mutex_unlock(dt->mut);
         i++;
@@ -129,12 +137,61 @@ t_data  *ft_init(int ac, char **av)
     dt->mut = malloc(sizeof(pthread_mutex_t));//Ici on initialise qu'un seul mutex
     if (!dt->mut)
         ft_freeall(dt, NULL, NULL, MEM_FAIL);
+
+
+
+
+    //Je malloc les mutex mut_fork (fourchette droite pour commencer)
+    //dt->mut_fork = malloc(sizeof(pthread_mutex_t) * dt->nphilo);
+    //if (!dt->mut_fork)
+    //    ft_freeall(dt, NULL, NULL, MEM_FAIL);//Pour etre exacte il faudrait aussi free dt->mut
+    //mais il s'agit juste d'une etape intermediaire
+    ///////////////////////////////////////////////////////////////////
+
+
+
+
+
+
     dt->philos = malloc(sizeof(t_philo) * dt->nphilo);
     if (!dt->philos)
         ft_freeall(dt, dt->mut, NULL, MEM_FAIL);
     //MALLOC autant de mutex qu'il y a de fourchettes (philos). MALLOC autant de thread qu'il y a de philos + 1 monitor
     if (pthread_mutex_init(dt->mut, NULL))
         ft_freeall(dt, dt->mut, dt->philos, MUT_FAIL);//Dans le cas ou je cree 1 seul mutex.
+
+
+
+
+
+
+    //On initialise ensuite toutes les fourchettes :
+    //int i;
+    //i = 0;
+    //while (i < dt->nphilo)
+    //{
+    //    if (pthread_mutex_init(&dt->mut_fork[i], NULL))
+    //        ft_freeall(dt, dt->mut_fork, NULL, MUT_FAIL);
+    //    i++;
+    //}
+    ////////////////////////////////////////////////
+
+
+    //Dans ft_initphilos on devra ensuite ajouter
+    //i = 0;
+    //while (i < dt->nphilo)
+    //{
+    //    // Cette logique peut elle etre mis dans une fonction avec une copie de dt ?
+    //    //Je me pose la question a cause du &dt->mut_fork.
+    //    dt->philos[i].r_fork = &dt->mut_fork[i];
+    //    dt->philos[i].l_fork = NULL;
+    //    i++;
+    //}
+    
+
+
+
+
     ft_initphilos(dt);//pas de malloc ici donc pas besoin de free. On a initialise les philos plus haut donc pas de risque de
     //mauvias indexage. Ils sont ous deja pret a etre remplis ici.
     return (dt);
@@ -152,6 +209,8 @@ void    ft_inithreads(t_data *dt)
     pthread_t       *th;
     int             i;
     
+    //Il faut creer un thread de + : le moniteur. Le moniteur ne va a priori pas
+    //utiliser ft_thread
     th = malloc(sizeof(pthread_t) * dt->nphilo);
     i = 0;
     while (i < dt->nphilo)
@@ -171,8 +230,7 @@ void    ft_inithreads(t_data *dt)
             ft_freeall(dt, dt->mut, dt->philos, THC_FAIL);
         i++;
     }
-    free(th);//Ici pour le moment, mais peut etre useless plus tard
-    
+    free(th);//Ici pour le moment, mais peut etre useless plus tard   
 }
 
 //Faire une fonction qui fait peter les malloc, les pthread create et les pthread_join
