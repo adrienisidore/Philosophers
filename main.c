@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/20 18:28:32 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/25 13:06:54 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ void    ft_exit(char *to_write)
     exit(0);
     
 }
-
+//Tous les philos ont acces a leur 2 fourchettes des le debut (autant de fourchettes que de philo)
+//a celui qui ira le + pour lock les 2 fourchettes
 void    *ft_thread(void *arg)
 {
     t_data          *dt;
@@ -55,7 +56,11 @@ void    *ft_thread(void *arg)
     //i est une variable locale, chaque CPU en  une copie
     i = 0;
     write(1, "Test from threads\n", 19);
-    while (i < 1000000)
+    
+    //1 permettre a chaque philo d'acceder a dt->mut
+    //2 changer l'argument de ft_thread pour qu'il recupere chaque mutex plutot que dt en argument
+    //afficher l'idx du thread qui incremente
+    while (i < 10)
     {
         pthread_mutex_lock(dt->mut);//Pour l'instant y'a qu'un seul mutex dans dt, et tous les threads l'utilisent pour incrementer mails
         //On peut faire UNE PREMIERE SIMULATION OU ON FAIT ECRIRE CHAQUE PHILO SON IDENTIFIANT ET C TOUT (UN MUTEX WRITE).
