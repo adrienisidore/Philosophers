@@ -5,255 +5,220 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/11 11:40:49 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/25 13:06:54 by aisidore         ###   ########.fr       */
+/*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
+/*   Updated: 2025/02/26 17:13:03 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-//penser au cas ou y'a 1 seul philo
-
-//gcc -S main.c utils.c parsing.c : obtenir le comportement CPU (Code Vault : What are race conditions ? 10min)
-//Peu d'iteration ne pose pas de pb car le 2eme thread n'a pas le temps d'etre cree avant
-//que le premier finisse son iteration
-
-
-//Quand je cree un thread c'est pour executer une fonction.
-//Pour creer un thread il faut creer une variable qui va contenir l'info que l'API thread renvoie :
-//une variable de type pthread_t. Pour initialiser la connexion entre la fonction routine et le thread,
-// on utilise pthread_create()
-
-//gcc ou cc pour la compil ?
-
-//Si time_to_die > time_to_eat alors après time_to_die milisecondes tous les philo
-//(paires/impairs) qui ont pas eu de fourchettes meurent.
-
 int mail = 0;
 
-void    ft_exit(char *to_write)
-{
-    if (to_write)
-    {
-        write(2, to_write, ft_strlen(to_write));
-        //L'exit code doit il changer en fonction de ce qui pete ?
-        exit(1);
-    }   
-    //L'exit code doit il changer en fonction de ce qui pete ?
-    exit(0);
-    
-}
-//Tous les philos ont acces a leur 2 fourchettes des le debut (autant de fourchettes que de philo)
-//a celui qui ira le + pour lock les 2 fourchettes
-void    *ft_thread(void *arg)
-{
-    t_data          *dt;
-    int             i;
+pthread_t       monitor;
 
-    //On recupere le mutex et on protege la data
-    dt = (t_data *)arg;
-
-    //i est une variable locale, chaque CPU en  une copie
-    i = 0;
-    write(1, "Test from threads\n", 19);
-    
-    //1 permettre a chaque philo d'acceder a dt->mut
-    //2 changer l'argument de ft_thread pour qu'il recupere chaque mutex plutot que dt en argument
-    //afficher l'idx du thread qui incremente
-    while (i < 10)
-    {
-        pthread_mutex_lock(dt->mut);//Pour l'instant y'a qu'un seul mutex dans dt, et tous les threads l'utilisent pour incrementer mails
-        //On peut faire UNE PREMIERE SIMULATION OU ON FAIT ECRIRE CHAQUE PHILO SON IDENTIFIANT ET C TOUT (UN MUTEX WRITE).
-        //ILS VONT SUREMENT ECRIRE UN PEU DANS LE DESORDRE ?
-
-        //Si je veux bloquer la donnee avec 2 mutex (fourchettes droite et gauche) il me suffit
-        //d'ecrire les 2 mutex a la suite ?
-        //pthread_mutex_lock(dt->philos->r_fork);
-        //pthread_mutex_lock(dt->philos->l_fork);
-        //write(1, "I'm eating ...", 15);
-        //pthread_mutex_unlock(dt->philos->r_fork);
-        //pthread_mutex_unlock(dt->philos->l_fork);
-        mail++;
-        pthread_mutex_unlock(dt->mut);
-        i++;
-    }
-    return (NULL);
-}
-void    ft_initdt(t_data *dt, int ac, char **av)
-{
-    // pthread_t   *th;
-    
-    dt->nphilo = ft_atol(av[1]);
-    dt->t_die = ft_atol(av[2]);
-    dt->t_eat = ft_atol(av[3]);
-    dt->t_sleep = ft_atol(av[4]);
-    // dt->t_think non initialise
-    if (ac == 6)
-        dt->many_eat = ft_atol(av[5]);
-    else
-        dt->many_eat = -1;
-}
-
-void    ft_initphilos(t_data *dt)
-{
-    long    i;
-
-    i = 0;
-    while (i < dt->nphilo) // Correction : `i` commence à 0 et va jusqu'à `nphilo - 1`
-    {
-        //avant j'ecrivais dt->philos->idx = i + 1; ce qui correspondait uniquement a l'indice du 1er philo
-        //qui etait constamment ecrase
-        dt->philos[i].idx = i + 1; // Assigner un identifiant unique (de 1 à nphilo)
-        dt->philos[i].dt = dt; // Associer chaque philosophe à la structure `dt`
-        i++;
-    }
-}
-
-
-void    ft_freeall(t_data *dt, pthread_mutex_t *dt_mut, t_philo *dt_philos, char *str)
-{
-    if (dt_mut)
-    {
-        //Si je fais appel a la fonction pour tout nettoyer c'est forcement qu'on est a un
-        //endroit critique ou il faut detruire le mutex (soit dans ft_init, soit ft_inithreads,
-        //soit a la fin du main). On creera plus tard ft_destroy pour detruire tous les mutex
-        if (dt && dt_mut && dt_philos)
-            pthread_mutex_destroy(dt->mut); 
-        free(dt_mut);//Quand y'en aura pleins on fera une boucle   
-    }
-    if (dt_philos)
-        free(dt_philos);
-    if (dt)
-        free(dt);
-    //si str : lancer ft_exit sans message (str = NULL alors exit 0)
-    if (str)
-        ft_exit(str);
-    ft_exit(NULL);
-}
-
-t_data  *ft_init(int ac, char **av)
-{
-    t_data      *dt;
-
-    dt = malloc(sizeof(t_data));
-    if (!dt)
-        ft_exit(MEM_FAIL);
-    ft_initdt(dt, ac, av);//tout ce qui n'est pas du malloc s'init ici
-    dt->mut = malloc(sizeof(pthread_mutex_t));//Ici on initialise qu'un seul mutex
-    if (!dt->mut)
-        ft_freeall(dt, NULL, NULL, MEM_FAIL);
-
-
-
-
-    //Je malloc les mutex mut_fork (fourchette droite pour commencer)
-    //dt->mut_fork = malloc(sizeof(pthread_mutex_t) * dt->nphilo);
-    //if (!dt->mut_fork)
-    //    ft_freeall(dt, NULL, NULL, MEM_FAIL);//Pour etre exacte il faudrait aussi free dt->mut
-    //mais il s'agit juste d'une etape intermediaire
-    ///////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-    dt->philos = malloc(sizeof(t_philo) * dt->nphilo);
-    if (!dt->philos)
-        ft_freeall(dt, dt->mut, NULL, MEM_FAIL);
-    //MALLOC autant de mutex qu'il y a de fourchettes (philos). MALLOC autant de thread qu'il y a de philos + 1 monitor
-    if (pthread_mutex_init(dt->mut, NULL))
-        ft_freeall(dt, dt->mut, dt->philos, MUT_FAIL);//Dans le cas ou je cree 1 seul mutex.
-
-
-
-
-
-
-    //On initialise ensuite toutes les fourchettes :
-    //int i;
-    //i = 0;
-    //while (i < dt->nphilo)
-    //{
-    //    if (pthread_mutex_init(&dt->mut_fork[i], NULL))
-    //        ft_freeall(dt, dt->mut_fork, NULL, MUT_FAIL);
-    //    i++;
-    //}
-    ////////////////////////////////////////////////
-
-
-    //Dans ft_initphilos on devra ensuite ajouter
-    //i = 0;
-    //while (i < dt->nphilo)
-    //{
-    //    // Cette logique peut elle etre mis dans une fonction avec une copie de dt ?
-    //    //Je me pose la question a cause du &dt->mut_fork.
-    //    dt->philos[i].r_fork = &dt->mut_fork[i];
-    //    dt->philos[i].l_fork = NULL;
-    //    i++;
-    //}
-    
-
-
-
-
-    ft_initphilos(dt);//pas de malloc ici donc pas besoin de free. On a initialise les philos plus haut donc pas de risque de
-    //mauvias indexage. Ils sont ous deja pret a etre remplis ici.
-    return (dt);
-}
-// void    ft_wait()
+// t_philo* ft_create_threads(pthread_mutex_t* mutex)
 // {
-
+//     t_philo* new_node;
+    
+//     new_node = (t_philo*)malloc(sizeof(t_philo));
+//     new_node->mutex = mutex;
+//     new_node->next = NULL;
+//     return (new_node);
 // }
 
-//Demander a GPT si il voit des ameliorations niveau protection car j'ai un peu fait a la onegain,
-//Surtout pour join. Si un join foire mais que les suivants pourrait fonctionner (ex le 3eme sur 5 foire)
-//est ce que c'est bien protege ?
-void    ft_inithreads(t_data *dt)
+//Changer une valeur protegee
+void    bool_set(pthread_mutex_t *mut_, int *to_set, int value)
 {
-    pthread_t       *th;
-    int             i;
-    
-    //Il faut creer un thread de + : le moniteur. Le moniteur ne va a priori pas
-    //utiliser ft_thread
-    th = malloc(sizeof(pthread_t) * dt->nphilo);
-    i = 0;
-    while (i < dt->nphilo)
-    {
-        if (pthread_create(&th[i], NULL, &ft_thread, dt))
-        {
-            while (--i >= 0)
-                pthread_join(dt->philos[i].thread, NULL);
-            ft_freeall(dt, dt->mut, dt->philos, TH_FAIL);
-        }
-        i++;
-    }
-    i = 0;
-    while (i < dt->nphilo)
-    {
-        if (pthread_join(th[i], NULL))
-            ft_freeall(dt, dt->mut, dt->philos, THC_FAIL);
-        i++;
-    }
-    free(th);//Ici pour le moment, mais peut etre useless plus tard   
+    pthread_mutex_lock(mut_);
+    *to_set = value;
+    pthread_mutex_unlock(mut_);
 }
 
-//Faire une fonction qui fait peter les malloc, les pthread create et les pthread_join
-int main(int ac, char **av)
+int    bool_send(pthread_mutex_t *mut_, int *to_get)
+{
+    int    res;
+
+    pthread_mutex_lock(mut_);
+    res = *to_get;//En passant par l'adresse je m'assure que le mutex protege,
+    //Si je mets qu'une copie alors le mutex ne protege pas
+    pthread_mutex_unlock(mut_);
+    return (res);
+}
+
+void *thread_monitor(void *arg)
 {
     t_data          *dt;
 
-    dt = ft_init(ac, ft_parser(ac, av));
+    dt = (t_data *)arg;
+    //Le temps que tous les autres threads aient ete cree
+    pthread_mutex_lock(dt->mut_stdout);
+    printf("Monitor start ...\n");
+    pthread_mutex_unlock(dt->mut_stdout);
+    //Le monitor est cree apres les philos, ils attendent l'avale du monitor pour commencer
+    bool_set(dt->mut_start, &dt->start, 1);
+    pthread_mutex_lock(dt->mut_stdout);
+    printf("Threads crees start = %d, lancement de la simulation ...\n", dt->start);
+    pthread_mutex_unlock(dt->mut_stdout);
+    return (NULL);
+}
+
+void *thread_function(void *arg)
+{
+    t_philo *philo = (t_philo *)arg;
+
+    // Les threads impairs attendent un peu pour éviter la compétition immédiate
+    //USELESS ? askip non pour un grand nb de mutex et sur les machines lentes
+
+    //Tant que la dummy start (protege par un mutex) est a 0 on attend 10 millisecondes
+    while (!bool_send(philo->dt->mut_start, &philo->dt->start))
+    {
+        // pthread_mutex_lock(&mutex);
+        // printf("Thread[%d] attend...\n", philo->id);
+        // pthread_mutex_unlock(&mutex);
+        usleep(25);
+    }
+    if (philo->id % 2 != 0)
+        usleep(300);  
+    // pthread_mutex_lock(&mutex);
+    // if (philo->id == NB_PHILO - 1)
+    // {
+    //     printf("Le dernier philo est lance...\n");
+    //     mail++;//Seul le dernier thread incremente mail   
+    // }
+    // pthread_mutex_unlock(&mutex);
+    // while (1)
+    // {
+    ///////////////////////////////////////////////// MANGER
+    pthread_mutex_lock(philo->s_fork);
+    pthread_mutex_lock(philo->f_fork);
+    //Pour chaque philo, je regarde l'heure a laquelle il commence a manger.
+    //Un monitor compare l'heure actuelle avec l'heure a laquelle il a mange pour la derniere fois (last_meal est dans dt)
+    //et si le monitor constate que la deadline est depassee alors il met une dummy a 1 dans dt, et tous les threads ayant
+    //acces a cette dummy s'arretent.
+    pthread_mutex_lock(philo->dt->mut_stdout);
+    printf("(start %d)Thread [%d] id : %lu    dt = %p a pris 2 fourchettes et mange. (f_fork: %p, s_fork: %p)\n", philo->dt->start,
+        philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
+    pthread_mutex_unlock(philo->dt->mut_stdout);
+    usleep(600);
+    pthread_mutex_lock(philo->dt->mut_stdout);
+    printf("(start %d)Thread [%d] id : %lu    dt = %p a fini de manger. (f_fork: %p, s_fork: %p)\n", philo->dt->start,
+        philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
+    pthread_mutex_unlock(philo->dt->mut_stdout);
+    pthread_mutex_unlock(philo->f_fork);
+    pthread_mutex_unlock(philo->s_fork);
+    ///////////////////////////////////////////////////////
     
-    ft_inithreads(dt);
+    ///////////////////////
+    pthread_mutex_lock(philo->dt->mut_stdout);
+    printf("Thread [%d] id : %lu dort.\n",
+        philo->id, (unsigned long)pthread_self());
+    pthread_mutex_unlock(philo->dt->mut_stdout);
+    usleep(600);
+    ///////////////////////
+    // }
+    
+    return NULL;
+}
 
-    // //On detruit le mutex une seule fois, meme si les threads ont echoue a join ou autre.
-    // //Comme ca aucun risque de le detruire plusieurs fois.
-    // pthread_mutex_destroy(dt->mut);//ft_destroy pour detruire tous les mutex
 
-    //Le resultat joint de plusieurs threads se situera apres les pthread_join
-    printf("mail = %d\n", mail);
+int main(int ac, char **av)
+{
+    (void)ac;
+    (void)av;
+    t_data   *dt;
+    t_philo* head;
+    t_philo* new_node;
+    t_philo* current;
+    int      i;
 
-    ft_freeall(dt, dt->mut, dt->philos, NULL);
+    pthread_mutex_t alf_fork[NB_PHILO];
+
+    head = NULL;
+    new_node = NULL;
+    current = NULL;
+    dt = malloc(sizeof(t_data));
+    dt->mut_start = NULL;
+    dt->mut_start = malloc(sizeof(pthread_mutex_t));
+    pthread_mutex_init(dt->mut_start, NULL);
+    dt->mut_stdout = NULL;
+    dt->mut_stdout = malloc(sizeof(pthread_mutex_t));
+    pthread_mutex_init(dt->mut_stdout, NULL);
+    dt->start = 0;
+    i = 0;
+    while (i < NB_PHILO)
+    {
+        pthread_mutex_init(&alf_fork[i], NULL);
+        i++;
+    }
+    i = 0;
+    while (i < NB_PHILO)
+    {
+        new_node = malloc(sizeof(t_philo));
+        new_node->id = i;
+        if (new_node->id % 2 == 0)
+        {
+            new_node->f_fork = &alf_fork[i];
+            new_node->s_fork = &alf_fork[(i + 1) % NB_PHILO];
+        }   
+        else
+        {
+            new_node->s_fork = &alf_fork[i];
+            new_node->f_fork = &alf_fork[(i + 1) % NB_PHILO];
+        }
+        new_node->dt = dt;
+        new_node->next = NULL;
+        if (!head)
+            head = new_node;
+        else
+            current->next = new_node;
+        current = new_node;
+        i++;
+    }
+
+    current = head;
+    i = 0;
+    while (i < NB_PHILO)
+    {
+        pthread_create(&current->thread, NULL, thread_function, (void*)current);
+        //Quand tous les threads sont pret on mesure l'heure (il faut tous les attendre)
+        current = current->next;
+        i++;
+    }
+    pthread_create(&monitor, NULL, thread_monitor, dt);//NULL car pas de mutex a atteindre pour l'instant
+    // On met la dummy start a 1 ce qui permet a thread_function de partir dans le while
+    pthread_join(monitor, NULL);
+    current = head;
+    i = 0;
+    while (i < NB_PHILO)
+    {
+        pthread_join(current->thread, NULL);
+        current = current->next;
+        i++;
+    }
+    i = 0;
+    while (i < NB_PHILO)
+    {
+        pthread_mutex_destroy(&alf_fork[i]);
+        i++;
+    }
+
+    dt->philos = head;
+    current = head;
+    i = 0;
+    while (i < NB_PHILO)
+    {
+        t_philo *temp = current;
+        current = current->next;
+        free(temp);
+        i++;
+    }
+    pthread_mutex_destroy(dt->mut_stdout);
+    pthread_mutex_destroy(dt->mut_start);
+    free(dt->mut_start);
+    free(dt->mut_stdout);
+    free(dt);
+    printf("Tous les threads ont terminé. La valeur de mail est : %d\n", mail);
+    
+    
     return (0);
 }
