@@ -6,46 +6,17 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/26 17:13:03 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/27 15:08:49 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int mail = 0;
+//1mettre au propre
 
-pthread_t       monitor;
+//2 faire le temps
 
-// t_philo* ft_create_threads(pthread_mutex_t* mutex)
-// {
-//     t_philo* new_node;
-    
-//     new_node = (t_philo*)malloc(sizeof(t_philo));
-//     new_node->mutex = mutex;
-//     new_node->next = NULL;
-//     return (new_node);
-// }
-
-//Changer une valeur protegee
-void    bool_set(pthread_mutex_t *mut_, int *to_set, int value)
-{
-    pthread_mutex_lock(mut_);
-    *to_set = value;
-    pthread_mutex_unlock(mut_);
-}
-
-int    bool_send(pthread_mutex_t *mut_, int *to_get)
-{
-    int    res;
-
-    pthread_mutex_lock(mut_);
-    res = *to_get;//En passant par l'adresse je m'assure que le mutex protege,
-    //Si je mets qu'une copie alors le mutex ne protege pas
-    pthread_mutex_unlock(mut_);
-    return (res);
-}
-
-void *thread_monitor(void *arg)
+void *ft_monitor(void *arg)
 {
     t_data          *dt;
 
@@ -54,15 +25,17 @@ void *thread_monitor(void *arg)
     pthread_mutex_lock(dt->mut_stdout);
     printf("Monitor start ...\n");
     pthread_mutex_unlock(dt->mut_stdout);
-    //Le monitor est cree apres les philos, ils attendent l'avale du monitor pour commencer
-    bool_set(dt->mut_start, &dt->start, 1);
+    //Le monitor est cree apres les philos, ils attendent l'avale du monitor pour commencer...
+    ft_setint(dt->mut_start, &dt->start, 1);
     pthread_mutex_lock(dt->mut_stdout);
-    printf("Threads crees start = %d, lancement de la simulation ...\n", dt->start);
+    printf("Tous les threads sont prets, lancement de la simulation ...\n");
     pthread_mutex_unlock(dt->mut_stdout);
+
+    //Checker le temps que prend chaque philo en permanence
     return (NULL);
 }
 
-void *thread_function(void *arg)
+void *ft_philos(void *arg)
 {
     t_philo *philo = (t_philo *)arg;
 
@@ -70,24 +43,10 @@ void *thread_function(void *arg)
     //USELESS ? askip non pour un grand nb de mutex et sur les machines lentes
 
     //Tant que la dummy start (protege par un mutex) est a 0 on attend 10 millisecondes
-    while (!bool_send(philo->dt->mut_start, &philo->dt->start))
-    {
-        // pthread_mutex_lock(&mutex);
-        // printf("Thread[%d] attend...\n", philo->id);
-        // pthread_mutex_unlock(&mutex);
-        usleep(25);
-    }
+    while (!ft_getint(philo->dt->mut_start, &philo->dt->start))
+        usleep(5);
     if (philo->id % 2 != 0)
-        usleep(300);  
-    // pthread_mutex_lock(&mutex);
-    // if (philo->id == NB_PHILO - 1)
-    // {
-    //     printf("Le dernier philo est lance...\n");
-    //     mail++;//Seul le dernier thread incremente mail   
-    // }
-    // pthread_mutex_unlock(&mutex);
-    // while (1)
-    // {
+        usleep(20); 
     ///////////////////////////////////////////////// MANGER
     pthread_mutex_lock(philo->s_fork);
     pthread_mutex_lock(philo->f_fork);
@@ -108,10 +67,10 @@ void *thread_function(void *arg)
     pthread_mutex_unlock(philo->s_fork);
     ///////////////////////////////////////////////////////
     
-    ///////////////////////
+    /////////////////////// DORMIR
     pthread_mutex_lock(philo->dt->mut_stdout);
-    printf("Thread [%d] id : %lu dort.\n",
-        philo->id, (unsigned long)pthread_self());
+    printf("Thread [%d] id : %lu dort pendant %dms.\n",
+        philo->id, (unsigned long)pthread_self(), 600);
     pthread_mutex_unlock(philo->dt->mut_stdout);
     usleep(600);
     ///////////////////////
@@ -125,89 +84,106 @@ int main(int ac, char **av)
 {
     (void)ac;
     (void)av;
+
+    //////////////////initdt
     t_data   *dt;
-    t_philo* head;
-    t_philo* new_node;
-    t_philo* current;
-    int      i;
 
-    pthread_mutex_t alf_fork[NB_PHILO];
-
-    head = NULL;
-    new_node = NULL;
-    current = NULL;
     dt = malloc(sizeof(t_data));
-    dt->mut_start = NULL;
-    dt->mut_start = malloc(sizeof(pthread_mutex_t));
+    dt->mut_start = malloc(sizeof(t_mut));
+    dt->mut_stdout = malloc(sizeof(t_mut));
     pthread_mutex_init(dt->mut_start, NULL);
-    dt->mut_stdout = NULL;
-    dt->mut_stdout = malloc(sizeof(pthread_mutex_t));
     pthread_mutex_init(dt->mut_stdout, NULL);
     dt->start = 0;
-    i = 0;
-    while (i < NB_PHILO)
+
+    /////////////////////////initforks
+    t_mut   *forks;
+    int     i;
+
+    //l'indexage des fourchettes est bien de 0 a 199 contrairement aux philos
+    forks = malloc(sizeof(t_mut) * NB_PHILO);
+    i = -1;
+    while (++i < NB_PHILO)
     {
-        pthread_mutex_init(&alf_fork[i], NULL);
-        i++;
+        pthread_mutex_init(&forks[i], NULL);
     }
-    i = 0;
-    while (i < NB_PHILO)
+
+
+    /////////initphilos
+    //L'INDICE DES PHILOS PART DE 1
+    //On peut pas rassembler les 3 t_philos* dans un tableau de pointeurs ??
+    t_philo *head;
+    t_philo *new_node;
+    t_philo *current;
+    int      j;
+    
+    head = NULL;
+    j = 0;
+    while (++j <= NB_PHILO)
     {
         new_node = malloc(sizeof(t_philo));
-        new_node->id = i;
+        new_node->id = j;
         if (new_node->id % 2 == 0)
         {
-            new_node->f_fork = &alf_fork[i];
-            new_node->s_fork = &alf_fork[(i + 1) % NB_PHILO];
+            new_node->f_fork = &forks[j - 1];
+            new_node->s_fork = &forks[j % NB_PHILO];
         }   
         else
         {
-            new_node->s_fork = &alf_fork[i];
-            new_node->f_fork = &alf_fork[(i + 1) % NB_PHILO];
+            new_node->s_fork = &forks[j - 1];
+            new_node->f_fork = &forks[j % NB_PHILO];
         }
         new_node->dt = dt;
         new_node->next = NULL;
         if (!head)
+        {
             head = new_node;
+            current = head;   
+        }
         else
             current->next = new_node;
         current = new_node;
-        i++;
     }
 
-    current = head;
-    i = 0;
-    while (i < NB_PHILO)
+    ////////////////////////////Lancement simulation
+    t_philo *curr;
+    
+    curr = head;
+    while (curr)
     {
-        pthread_create(&current->thread, NULL, thread_function, (void*)current);
-        //Quand tous les threads sont pret on mesure l'heure (il faut tous les attendre)
-        current = current->next;
-        i++;
+        pthread_create(&curr->thread, NULL, ft_philos, (void*)curr);
+        curr = curr->next;
     }
-    pthread_create(&monitor, NULL, thread_monitor, dt);//NULL car pas de mutex a atteindre pour l'instant
-    // On met la dummy start a 1 ce qui permet a thread_function de partir dans le while
-    pthread_join(monitor, NULL);
-    current = head;
-    i = 0;
-    while (i < NB_PHILO)
+    //TOUS LES THREADS SONT PRETS :
+    //Le monitor met start a 1 et mesure l'heure pour savoir quand la simulation commence
+    pthread_create(&dt->monit, NULL, ft_monitor, dt);
+    pthread_join(dt->monit, NULL);
+    curr = head;
+    while (curr)
     {
-        pthread_join(current->thread, NULL);
-        current = current->next;
-        i++;
-    }
-    i = 0;
-    while (i < NB_PHILO)
-    {
-        pthread_mutex_destroy(&alf_fork[i]);
-        i++;
+        pthread_join(curr->thread, NULL);
+        curr = curr->next;
     }
 
-    dt->philos = head;
+
+    //////////////////Fin de simulation
+    t_philo *temp;
+    int     k;
+    
+    k = -1;
+    //RAPPEL : l'indexage des fourchettes est bien de 0 a 199
+    //contrairement aux philos
+    while (++k < NB_PHILO)
+    {
+        pthread_mutex_destroy(&forks[k]);
+    }
+    free(forks);
+    
+    // dt->philos = head;
     current = head;
     i = 0;
     while (i < NB_PHILO)
     {
-        t_philo *temp = current;
+        temp = current;
         current = current->next;
         free(temp);
         i++;
@@ -217,8 +193,7 @@ int main(int ac, char **av)
     free(dt->mut_start);
     free(dt->mut_stdout);
     free(dt);
-    printf("Tous les threads ont terminé. La valeur de mail est : %d\n", mail);
-    
+    printf("Tous les threads ont terminé.\n");
     
     return (0);
 }
