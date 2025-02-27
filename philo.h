@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/27 15:04:59 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/27 15:19:52 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,8 @@ typedef struct s_philo
 typedef struct s_data
 {
     int             start;
-    t_mut           *mut_start;
-    t_mut           *mut_stdout;
+    t_mut           mut_start;
+    t_mut           mut_stdout;
     pthread_t       monit;
     t_philo         *philos; 
 }   t_data;

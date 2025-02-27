@@ -6,7 +6,7 @@
 #    By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/11 11:40:55 by aisidore          #+#    #+#              #
-#    Updated: 2025/02/27 15:09:33 by aisidore         ###   ########.fr        #
+#    Updated: 2025/02/27 15:33:15 by aisidore         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,8 +19,8 @@ SRC = main.c \
 OBJ = $(OBJ_DIR)/main.o \
 	  $(OBJ_DIR)/ft_setget.o
 
-FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
-# FL = -Wall -Wextra -Werror -pthread
+# FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
+FL = -Wall -Wextra -Werror -pthread
 
 all: philo
 
