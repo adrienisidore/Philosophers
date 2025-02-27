@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/27 15:35:55 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/02/27 17:57:44 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,20 @@
 //1mettre au propre
 
 //2 faire le temps
+
+
+void    ft_exit(char *to_write)
+{
+    if (to_write)
+    {
+        write(2, to_write, ft_strlen(to_write));
+        //L'exit code doit il changer en fonction de ce qui pete ?
+        exit(1);
+    }   
+    //L'exit code doit il changer en fonction de ce qui pete ?
+    exit(0);
+    
+}
 
 void *ft_monitor(void *arg)
 {
@@ -79,76 +93,116 @@ void *ft_philos(void *arg)
     return NULL;
 }
 
-
-int main(int ac, char **av)
+t_mut   *ft_initforks(t_data *dt)
 {
-    (void)ac;
-    (void)av;
-
-    //////////////////initdt
-    t_data   *dt;
-
-    dt = malloc(sizeof(t_data));
-    pthread_mutex_init(&dt->mut_start, NULL);
-    pthread_mutex_init(&dt->mut_stdout, NULL);
-    dt->start = 0;
-
-    /////////////////////////initforks
     t_mut   *forks;
     int     i;
 
     //l'indexage des fourchettes est bien de 0 a 199 contrairement aux philos
-    forks = malloc(sizeof(t_mut) * NB_PHILO);
+    forks = malloc(sizeof(t_mut) * dt->nphilo);
+    if (!forks)
+    {
+        free(dt);
+        ft_exit(MEM_FAIL);
+    }
     i = -1;
-    while (++i < NB_PHILO)
+    while (++i < dt->nphilo)
     {
         //Chaque fourchette est un mutex et seul le tableau est * (malloce) donc on fait
         //la meme chose pour mut_stdout et mut_start (ils deviennent juste des mutex)
-        pthread_mutex_init(&forks[i], NULL);
+        // pthread_mutex_init(&forks[i], NULL);
+        if (pthread_mutex_init(&forks[i], NULL))
+        {
+            while (--i >= 0)
+                pthread_mutex_destroy(&forks[i]);
+            free(forks);
+            free(dt);
+            ft_exit(MUT_FAIL);
+        }
     }
+    return (forks);
+}
 
+t_data  *ft_inidt(int ac, char **av)
+{
+    t_data  *dt;
+    
+    dt = malloc(sizeof(t_data));
+    if (!dt)
+        ft_exit(MEM_FAIL);
+    dt->nphilo = ft_atol(av[1]);
+    dt->t_die = ft_atol(av[2]);
+    dt->t_eat = ft_atol(av[3]);
+    dt->t_sleep = ft_atol(av[4]);
+    // dt->t_think non initialise
+    if (ac == 6)
+        dt->many_eat = ft_atol(av[5]);
+    else
+        dt->many_eat = -1;
+    dt->forks = ft_initforks(dt);
+    //A PROTEGER
+    pthread_mutex_init(&dt->mut_start, NULL);
+    pthread_mutex_init(&dt->mut_stdout, NULL);
+    //si le premier pete alors on arrete (apres free)
+    //Si le 2eme pete alors il faut destroy le 1er puis arreter (apres free)
+    dt->start = 0;
+    return (dt);
+}
 
-    /////////initphilos
+void    ft_dispatch(t_philo *new_philo, t_data *dt, int j)
+{
+    if (new_philo->id % 2 == 0)
+    {
+        new_philo->f_fork = &dt->forks[j - 1];
+        new_philo->s_fork = &dt->forks[j % dt->nphilo];
+    }   
+    else
+    {
+        new_philo->s_fork = &dt->forks[j - 1];
+        new_philo->f_fork = &dt->forks[j % dt->nphilo];
+    }
+}
+
+int main(int ac, char **av)
+{
+    t_data   *dt;
+
+    dt = ft_inidt(ac, ft_parser(ac, av));
+
+    /////////initphilos(dt) : a la fin lst est arime a dt via dt->philos;
     //L'INDICE DES PHILOS PART DE 1
     //On peut pas rassembler les 3 t_philos* dans un tableau de pointeurs ??
     
     //On initialise les philos apres dt comme ca on peut faire new_node->dt = dt;
-    t_philo *head;
-    t_philo *new_node;
+    t_philo *lst;
+    t_philo *new_philo;
     t_philo *current;
     int      j;
     
-    head = NULL;
+    lst = NULL;
     j = 0;
-    while (++j <= NB_PHILO)
+    while (++j <= dt->nphilo)
     {
-        new_node = malloc(sizeof(t_philo));
-        new_node->id = j;
-        // ft_dispatch_fork()
-        if (new_node->id % 2 == 0)
-        {
-            new_node->f_fork = &forks[j - 1];
-            new_node->s_fork = &forks[j % NB_PHILO];
-        }   
+        new_philo = malloc(sizeof(t_philo));
+        new_philo->dt = dt;
+        new_philo->id = j;
+        ft_dispatch(new_philo, dt, j);
+        new_philo->next = NULL;
+        if (!lst)
+            lst = new_philo;
         else
-        {
-            new_node->s_fork = &forks[j - 1];
-            new_node->f_fork = &forks[j % NB_PHILO];
-        }
-        ///////////////////////////////////
-        new_node->dt = dt;
-        new_node->next = NULL;
-        if (!head)
-            head = new_node;
-        else
-            current->next = new_node;
-        current = new_node;
+            current->next = new_philo;
+        current = new_philo;
     }
 
+    // dt->philos = ft_initphilos(dt);
+
+
+    
     ////////////////////////////Lancement simulation
     t_philo *curr;
     
-    curr = head;
+    curr = lst;
     while (curr)
     {
         pthread_create(&curr->thread, NULL, ft_philos, (void*)curr);
@@ -158,7 +212,7 @@ int main(int ac, char **av)
     //Le monitor met start a 1 et mesure l'heure pour savoir quand la simulation commence
     pthread_create(&dt->monit, NULL, ft_monitor, dt);
     pthread_join(dt->monit, NULL);
-    curr = head;
+    curr = lst;
     while (curr)
     {
         pthread_join(curr->thread, NULL);
@@ -174,13 +228,13 @@ int main(int ac, char **av)
     k = -1;
     //RAPPEL : l'indexage des fourchettes est bien de 0 a 199
     //contrairement aux philos
-    while (++k < NB_PHILO)
+    while (++k < dt->nphilo)
     {
-        pthread_mutex_destroy(&forks[k]);
+        pthread_mutex_destroy(&dt->forks[k]);
     }
-    free(forks);
+    free(dt->forks);
     
-    curr_ = head;
+    curr_ = lst;
     while (curr_)
     {
         temp = curr_;
