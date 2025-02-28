@@ -12,6 +12,15 @@
 
 #include "philo.h"
 
+//Faire peter malloc et init a differents endroits pour voir si les protections sont bonnes
+
+//J'ai des deadlocks parfois (depuis que j'ai mis while (1)) : Un thread bloque une ressource
+//et attend une autre qui est déjà prise par un autre thread.
+//Aucun thread ne peut progresser car ils attendent tous indéfiniment.
+//HYPOTHESES : certains threads attendent d'avoir acces a dt->start et en meme temps ont
+//des fourchettes, et en meme temps ont des fourchettes ce qui empeche les autres de
+//continuer.
+
 //1mettre au propre
 
 //2 faire le temps
@@ -28,6 +37,17 @@ void    ft_exit(char *to_write)
     //L'exit code doit il changer en fonction de ce qui pete ?
     exit(0);
     
+}
+
+void    ft_freeall(t_data *dt, t_philo *lst_philo, char *str)
+{
+    if (lst_philo)
+    {
+        
+    }
+    if (dt)
+        free(dt);
+    ft_exit(str);
 }
 
 void *ft_monitor(void *arg)
@@ -55,6 +75,7 @@ void *ft_monitor(void *arg)
 void *ft_philos(void *arg)
 {
     t_philo *philo = (t_philo *)arg;
+    int     rr;
 
     // Les threads impairs attendent un peu pour éviter la compétition immédiate
     //USELESS ? askip non pour un grand nb de mutex et sur les machines lentes
@@ -63,10 +84,22 @@ void *ft_philos(void *arg)
     while (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
         usleep(5);
     if (philo->id % 2 != 0)
-        usleep(20); 
-    ///////////////////////////////////////////////// MANGER
-    while (ft_getint(&philo->dt->mut_start, &philo->dt->start))
-    {
+        usleep(20);
+    rr = 0; 
+    //while (rr < 2)
+    //{
+        ///////////////////////////////////////////////// MANGER
+        //if (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
+        //    return (NULL);
+
+        //ATTENTION LES DATARACE peuvent etre provoque par des lectures non proteges d'une meme variable.
+        //Ex je pourrai avoir un souci de datarace dans le futur si 2 threads lisent  les memes adresses de fourchettes
+        //car je les ai pas protege
+        pthread_mutex_lock(&philo->dt->mut_stdout);
+        printf("(start %d)Thread [%d] id : %lu    dt = %p a pris 2 fourchettes et mange. (f_fork: %p, s_fork: %p)\n", ft_getint(&philo->dt->mut_start, &philo->dt->start),
+            philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
+        pthread_mutex_unlock(&philo->dt->mut_stdout);
+        
         pthread_mutex_lock(philo->s_fork);
         pthread_mutex_lock(philo->f_fork);
         //Pour chaque philo, je regarde l'heure a laquelle il commence a manger.
@@ -74,45 +107,32 @@ void *ft_philos(void *arg)
         //et si le monitor constate que la deadline est depassee alors il met une dummy a 1 dans dt, et tous les threads ayant
         //acces a cette dummy s'arretent.
 
-        //ATTENTION LES DATARACE peuvent etre provoque par des lectures non proteges d'une meme variable.
-        //Ex je pourrai avoir un souci de datarace dans le futur si 2 threads lisent  les memes adresses de fourchettes
-        //car je les ai pas protege
-        pthread_mutex_lock(&philo->dt->mut_stdout);
-        if (ft_getint(&philo->dt->mut_start, &philo->dt->start))
-        {
-            printf("(start %d)Thread [%d] id : %lu    dt = %p a pris 2 fourchettes et mange. (f_fork: %p, s_fork: %p)\n", ft_getint(&philo->dt->mut_start, &philo->dt->start),
-                philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
+        usleep(600);//Temps durant lequel il mange
 
-        }
-        pthread_mutex_unlock(&philo->dt->mut_stdout);
-        if (ft_getint(&philo->dt->mut_start, &philo->dt->start))
-            usleep(600);
-        pthread_mutex_lock(&philo->dt->mut_stdout);
-        if (ft_getint(&philo->dt->mut_start, &philo->dt->start))
-        {
-            printf("(start %d)Thread [%d] id : %lu    dt = %p a fini de manger. (f_fork: %p, s_fork: %p)\n", ft_getint(&philo->dt->mut_start, &philo->dt->start),
-                philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
-        }
-        pthread_mutex_unlock(&philo->dt->mut_stdout);
         pthread_mutex_unlock(philo->f_fork);
         pthread_mutex_unlock(philo->s_fork);
+
+        pthread_mutex_lock(&philo->dt->mut_stdout);
+        printf("(start %d)Thread [%d] id : %lu    dt = %p a fini de manger. (f_fork: %p, s_fork: %p)\n", ft_getint(&philo->dt->mut_start, &philo->dt->start),
+            philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
+        pthread_mutex_unlock(&philo->dt->mut_stdout);
+
         ///////////////////////////////////////////////////////
     
         /////////////////////// DORMIR
+        //if (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
+        //    return (NULL);
         pthread_mutex_lock(&philo->dt->mut_stdout);
-        if (ft_getint(&philo->dt->mut_start, &philo->dt->start))
-        {
-            printf("Thread [%d] id : %lu dort pendant %dms.\n",
-                philo->id, (unsigned long)pthread_self(), 600);
-        }
+        printf("Thread [%d] id : %lu dort pendant %dms.\n",
+            philo->id, (unsigned long)pthread_self(), 600);
         pthread_mutex_unlock(&philo->dt->mut_stdout);
-        if (ft_getint(&philo->dt->mut_start, &philo->dt->start))
-            usleep(600);
+        usleep(600);
         ///////////////////////
-    }
+        rr++;
+    //}
     
     
-    return NULL;
+    return (NULL);
 }
 
 t_mut   *ft_initforks(t_data *dt)
@@ -138,6 +158,8 @@ t_mut   *ft_initforks(t_data *dt)
             while (--i >= 0)
                 pthread_mutex_destroy(&forks[i]);
             free(forks);
+            pthread_mutex_destroy(&dt->mut_start);
+            pthread_mutex_destroy(&dt->mut_stdout);
             free(dt);
             ft_exit(MUT_FAIL);
         }
@@ -152,6 +174,18 @@ t_data  *ft_inidt(int ac, char **av)
     dt = malloc(sizeof(t_data));
     if (!dt)
         ft_exit(MEM_FAIL);
+    //ft_freeall pour gagner des lignes
+    if (pthread_mutex_init(&dt->mut_start, NULL))
+    {
+        free(dt);
+        ft_exit(MUT_FAIL);
+    }
+    if (pthread_mutex_init(&dt->mut_stdout, NULL))
+    {
+        pthread_mutex_destroy(&dt->mut_start);
+        free(dt);
+        ft_exit(MUT_FAIL); 
+    }
     dt->nphilo = ft_atol(av[1]);
     dt->t_die = ft_atol(av[2]);
     dt->t_eat = ft_atol(av[3]);
@@ -162,11 +196,6 @@ t_data  *ft_inidt(int ac, char **av)
     else
         dt->many_eat = -1;
     dt->forks = ft_initforks(dt);
-    //A PROTEGER
-    pthread_mutex_init(&dt->mut_start, NULL);
-    pthread_mutex_init(&dt->mut_stdout, NULL);
-    //si le premier pete alors on arrete (apres free)
-    //Si le 2eme pete alors il faut destroy le 1er puis arreter (apres free)
     dt->start = 0;
     return (dt);
 }
