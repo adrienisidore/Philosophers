@@ -89,8 +89,8 @@ void *ft_philos(void *arg)
     //while (rr < 2)
     //{
         ///////////////////////////////////////////////// MANGER
-        //if (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
-        //    return (NULL);
+        if (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
+            return (NULL);
 
         //ATTENTION LES DATARACE peuvent etre provoque par des lectures non proteges d'une meme variable.
         //Ex je pourrai avoir un souci de datarace dans le futur si 2 threads lisent  les memes adresses de fourchettes
@@ -99,7 +99,7 @@ void *ft_philos(void *arg)
         printf("(start %d)Thread [%d] id : %lu    dt = %p a pris 2 fourchettes et mange. (f_fork: %p, s_fork: %p)\n", ft_getint(&philo->dt->mut_start, &philo->dt->start),
             philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
         pthread_mutex_unlock(&philo->dt->mut_stdout);
-        
+
         pthread_mutex_lock(philo->s_fork);
         pthread_mutex_lock(philo->f_fork);
         //Pour chaque philo, je regarde l'heure a laquelle il commence a manger.
@@ -112,6 +112,9 @@ void *ft_philos(void *arg)
         pthread_mutex_unlock(philo->f_fork);
         pthread_mutex_unlock(philo->s_fork);
 
+        if (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
+            return (NULL);
+
         pthread_mutex_lock(&philo->dt->mut_stdout);
         printf("(start %d)Thread [%d] id : %lu    dt = %p a fini de manger. (f_fork: %p, s_fork: %p)\n", ft_getint(&philo->dt->mut_start, &philo->dt->start),
             philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
@@ -120,8 +123,8 @@ void *ft_philos(void *arg)
         ///////////////////////////////////////////////////////
     
         /////////////////////// DORMIR
-        //if (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
-        //    return (NULL);
+        if (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
+            return (NULL);
         pthread_mutex_lock(&philo->dt->mut_stdout);
         printf("Thread [%d] id : %lu dort pendant %dms.\n",
             philo->id, (unsigned long)pthread_self(), 600);
