@@ -44,7 +44,10 @@ void *ft_monitor(void *arg)
     pthread_mutex_lock(&dt->mut_stdout);
     printf("Tous les threads sont prets, lancement de la simulation ...\n");
     pthread_mutex_unlock(&dt->mut_stdout);
-
+    //A la place du usleep on check si un philo a pris trop de temps
+    //entre son last meal et quand il commence a manger
+    usleep(10000);
+    ft_setint(&dt->mut_start, &dt->start, 0);
     //Checker le temps que prend chaque philo en permanence
     return (NULL);
 }
@@ -62,33 +65,52 @@ void *ft_philos(void *arg)
     if (philo->id % 2 != 0)
         usleep(20); 
     ///////////////////////////////////////////////// MANGER
-    pthread_mutex_lock(philo->s_fork);
-    pthread_mutex_lock(philo->f_fork);
-    //Pour chaque philo, je regarde l'heure a laquelle il commence a manger.
-    //Un monitor compare l'heure actuelle avec l'heure a laquelle il a mange pour la derniere fois (last_meal est dans dt)
-    //et si le monitor constate que la deadline est depassee alors il met une dummy a 1 dans dt, et tous les threads ayant
-    //acces a cette dummy s'arretent.
-    pthread_mutex_lock(&philo->dt->mut_stdout);
-    printf("(start %d)Thread [%d] id : %lu    dt = %p a pris 2 fourchettes et mange. (f_fork: %p, s_fork: %p)\n", philo->dt->start,
-        philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
-    pthread_mutex_unlock(&philo->dt->mut_stdout);
-    usleep(600);
-    pthread_mutex_lock(&philo->dt->mut_stdout);
-    printf("(start %d)Thread [%d] id : %lu    dt = %p a fini de manger. (f_fork: %p, s_fork: %p)\n", philo->dt->start,
-        philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
-    pthread_mutex_unlock(&philo->dt->mut_stdout);
-    pthread_mutex_unlock(philo->f_fork);
-    pthread_mutex_unlock(philo->s_fork);
-    ///////////////////////////////////////////////////////
+    while (ft_getint(&philo->dt->mut_start, &philo->dt->start))
+    {
+        pthread_mutex_lock(philo->s_fork);
+        pthread_mutex_lock(philo->f_fork);
+        //Pour chaque philo, je regarde l'heure a laquelle il commence a manger.
+        //Un monitor compare l'heure actuelle avec l'heure a laquelle il a mange pour la derniere fois (last_meal est dans dt)
+        //et si le monitor constate que la deadline est depassee alors il met une dummy a 1 dans dt, et tous les threads ayant
+        //acces a cette dummy s'arretent.
+
+        //ATTENTION LES DATARACE peuvent etre provoque par des lectures non proteges d'une meme variable.
+        //Ex je pourrai avoir un souci de datarace dans le futur si 2 threads lisent  les memes adresses de fourchettes
+        //car je les ai pas protege
+        pthread_mutex_lock(&philo->dt->mut_stdout);
+        if (ft_getint(&philo->dt->mut_start, &philo->dt->start))
+        {
+            printf("(start %d)Thread [%d] id : %lu    dt = %p a pris 2 fourchettes et mange. (f_fork: %p, s_fork: %p)\n", ft_getint(&philo->dt->mut_start, &philo->dt->start),
+                philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
+
+        }
+        pthread_mutex_unlock(&philo->dt->mut_stdout);
+        if (ft_getint(&philo->dt->mut_start, &philo->dt->start))
+            usleep(600);
+        pthread_mutex_lock(&philo->dt->mut_stdout);
+        if (ft_getint(&philo->dt->mut_start, &philo->dt->start))
+        {
+            printf("(start %d)Thread [%d] id : %lu    dt = %p a fini de manger. (f_fork: %p, s_fork: %p)\n", ft_getint(&philo->dt->mut_start, &philo->dt->start),
+                philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
+        }
+        pthread_mutex_unlock(&philo->dt->mut_stdout);
+        pthread_mutex_unlock(philo->f_fork);
+        pthread_mutex_unlock(philo->s_fork);
+        ///////////////////////////////////////////////////////
     
-    /////////////////////// DORMIR
-    pthread_mutex_lock(&philo->dt->mut_stdout);
-    printf("Thread [%d] id : %lu dort pendant %dms.\n",
-        philo->id, (unsigned long)pthread_self(), 600);
-    pthread_mutex_unlock(&philo->dt->mut_stdout);
-    usleep(600);
-    ///////////////////////
-    // }
+        /////////////////////// DORMIR
+        pthread_mutex_lock(&philo->dt->mut_stdout);
+        if (ft_getint(&philo->dt->mut_start, &philo->dt->start))
+        {
+            printf("Thread [%d] id : %lu dort pendant %dms.\n",
+                philo->id, (unsigned long)pthread_self(), 600);
+        }
+        pthread_mutex_unlock(&philo->dt->mut_stdout);
+        if (ft_getint(&philo->dt->mut_start, &philo->dt->start))
+            usleep(600);
+        ///////////////////////
+    }
+    
     
     return NULL;
 }
