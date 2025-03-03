@@ -6,33 +6,11 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:04 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/03 15:44:44 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/03 17:54:18 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-long    ft_time(struct timeval time)
-{
-	long	res;
-
-	res = time.tv_sec * 1000 + time.tv_usec / 1000;
-	return (res);
-}
-
-int     ft_isnum(const char c)
-{
-    if (c >= '0' && c <= '9')
-        return (1);
-    return (0);
-}
-
-int     ft_ispace(const char c)
-{
-    if (c == ' ' || c == '\n' || c == '\t')
-        return (1);
-    return (0);
-}
 
 size_t	ft_strlen(const char *str)
 {
@@ -71,4 +49,48 @@ long int	ft_atol(const char *str)
 				ft_exit(INV_ARG);
 	}
 	return (r * sign);
+}
+
+
+static int	ft_size(long nb)
+{
+	int	res;
+
+	res = 0;
+	if (!nb)
+		return (1);
+	if (nb < 0)
+	{
+		res++;
+		nb = -nb;
+	}
+	while (nb > 0)
+	{
+		nb = nb / 10;
+		res++;
+	}
+	return (res);
+}
+
+char	*ft_ltoa(long n)
+{
+	static char	str[100];//Possible d'avoir un nb de taille superieur a 99 caracteres ?
+	int			len;
+	long		nb;
+
+	nb = (long)n;
+	len = ft_size(nb);
+	if (nb < 0)
+		nb = nb * -1;
+	str[len] = '\0';
+	len--;
+	while (len >= 0)
+	{
+		str[len] = (nb % 10) + '0';
+		nb = nb / 10;
+		len--;
+	}
+	if (n < 0)
+		str[0] = '-';
+	return (str);
 }

@@ -6,14 +6,12 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/03 17:06:40 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/03 17:55:44 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
-
-# define NB_PHILO 200
 
 # define R_SYNTAX        "philo: Correct syntax: ./philo number_of_philosophers time_to_die "
 # define PARAM_ERROR     R_SYNTAX "time_to_eat time_to_sleep" PARAM_OPT
@@ -26,7 +24,7 @@
 # define TH_FAIL         "philo: Thread creation failed\n"
 # define THC_FAIL        "philo: Thread connexion failed\n"
 
-# include <stdio.h>//printf (useless en temps normal)
+# include <stdio.h>//printf (useless en temps normal), essayer de l'enlever a la fin pour voir
 # include <unistd.h>//write
 # include <stdlib.h>//exit, size_t
 # include <pthread.h>
@@ -69,15 +67,13 @@ typedef struct s_data
 void        ft_exit(char *to_write);
 int         ft_freeall(t_mut *forks, t_philo *lst_philo, t_data *dt, char *str);
 
-//parsing.c
+//ft_parser.c
 char        **ft_parser(int ac, char **av);
 
 //utils.c
-long        ft_time(struct timeval time);
 size_t	    ft_strlen(const char *str);
-int         ft_isnum(const char c);
-int         ft_ispace(const char c);
 long int	ft_atol(const char *str);
+char	    *ft_ltoa(long n);
 
 //ft_setget.c
 void        ft_setint(t_mut *mut_, int *to_set, int value);
@@ -89,6 +85,7 @@ long        ft_getlong(t_mut *mut_, long *to_get);
 t_data      *ft_inidt(int ac, char **av);
 
 //simulation.c
+long        ft_time(struct timeval time);
 void        *ft_monitor(void *arg);
 void        *ft_philos(void *arg);
 
