@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/03 14:02:15 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/03 17:06:40 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 # include <stdlib.h>//exit, size_t
 # include <pthread.h>
 # include <limits.h>
+# include <sys/time.h>
 
 typedef struct s_data t_data;
 typedef pthread_mutex_t	t_mut;
@@ -41,6 +42,9 @@ typedef struct s_philo
     pthread_t       thread;
     t_mut           *f_fork;
     t_mut           *s_fork;
+    long			last_meal;//heure du dernier repas
+    long			nb_meal;
+    int             is_full;
     t_data          *dt;
     struct s_philo* next;
 }   t_philo;
@@ -56,17 +60,20 @@ typedef struct s_data
     t_mut           mut_start;
     t_mut           mut_stdout;
     t_mut           *forks;
+    t_mut           l_meal;
     pthread_t       monit;
     t_philo         *philos; 
 }   t_data;
 
 //main.c
 void        ft_exit(char *to_write);
+int         ft_freeall(t_mut *forks, t_philo *lst_philo, t_data *dt, char *str);
 
 //parsing.c
 char        **ft_parser(int ac, char **av);
 
 //utils.c
+long        ft_time(struct timeval time);
 size_t	    ft_strlen(const char *str);
 int         ft_isnum(const char c);
 int         ft_ispace(const char c);
@@ -79,11 +86,11 @@ int         ft_getint(t_mut *mut_, int *to_get);
 long        ft_getlong(t_mut *mut_, long *to_get);
 
 //ft_inidt.c
-t_data  *ft_inidt(int ac, char **av);
+t_data      *ft_inidt(int ac, char **av);
 
 //simulation.c
-void *ft_monitor(void *arg);
-void *ft_philos(void *arg);
+void        *ft_monitor(void *arg);
+void        *ft_philos(void *arg);
 
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:57:39 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/03 14:02:29 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/03 17:16:58 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ static t_philo  *ft_initphilo(t_data *dt)
         if (!new_philo)
             ft_freeall(dt->forks, dt->philos, dt, MEM_FAIL);
         new_philo->dt = dt;
+        new_philo->nb_meal = dt->many_eat;
         new_philo->id = j;
         ft_dispatch(new_philo, dt, j);
         new_philo->next = NULL;
@@ -83,7 +84,7 @@ static t_philo  *ft_initphilo(t_data *dt)
 
 t_data  *ft_inidt(int ac, char **av)
 {
-    t_data  *dt;
+    t_data          *dt;
     
     dt = malloc(sizeof(t_data));
     if (!dt)
@@ -95,16 +96,22 @@ t_data  *ft_inidt(int ac, char **av)
         pthread_mutex_destroy(&dt->mut_start);
         ft_freeall(NULL, NULL, dt, MUT_FAIL); 
     }
+    if (pthread_mutex_init(&dt->l_meal, NULL))
+    {
+        pthread_mutex_destroy(&dt->mut_stdout);
+        pthread_mutex_destroy(&dt->mut_start);
+        ft_freeall(NULL, NULL, dt, MUT_FAIL); 
+    }
     dt->nphilo = ft_atol(av[1]);
     dt->t_die = ft_atol(av[2]);
     dt->t_eat = ft_atol(av[3]);
     dt->t_sleep = ft_atol(av[4]);
+    dt->start = 0;
     if (ac == 6)
         dt->many_eat = ft_atol(av[5]);
     else
         dt->many_eat = -1;
     dt->forks = ft_initforks(dt);
     dt->philos = ft_initphilo(dt);
-    dt->start = 0;
     return (dt);
 }

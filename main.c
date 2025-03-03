@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/03 14:01:48 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/03 17:03:03 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 //1mettre au propre
 
 //2 faire le temps
+
+//GERER LE CAS OU 1 philo, 0 philo et ;any_meal == 0 (ils doivent pas manger);
 
 //                  SUR ORDI LENT
 //J'ai des deadlocks parfois (depuis que j'ai mis while (1)) : Un thread bloque une ressource
@@ -37,7 +39,7 @@ void    ft_exit(char *to_write)
     
 }
 
-void    ft_freephilo(t_data *dt)
+static void    ft_freephilo(t_data *dt)
 {
     t_philo *temp;
     t_philo *curr_;
@@ -69,10 +71,9 @@ int    ft_freeall(t_mut *forks, t_philo *lst_philo, t_data *dt, char *str)
         ft_freephilo(dt);
     if (forks && lst_philo && dt)
     {
-        //Si les 3 sont precise c'est qu'on est en train de
-        //tout vider
         pthread_mutex_destroy(&dt->mut_stdout);
         pthread_mutex_destroy(&dt->mut_start);
+        pthread_mutex_destroy(&dt->l_meal);
     }
     if (dt)
         free(dt);

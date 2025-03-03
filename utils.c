@@ -6,11 +6,19 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:04 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/20 16:15:21 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/03 15:44:44 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+long    ft_time(struct timeval time)
+{
+	long	res;
+
+	res = time.tv_sec * 1000 + time.tv_usec / 1000;
+	return (res);
+}
 
 int     ft_isnum(const char c)
 {
