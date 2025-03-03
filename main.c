@@ -6,11 +6,14 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/03 17:03:03 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/03 20:00:48 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+//Retracer raisonnement Erika du debut a la fin et ajouter les elements manquants puis tester
+
 
 //1mettre au propre
 

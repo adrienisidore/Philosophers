@@ -6,13 +6,13 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:59:46 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/03 19:34:49 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/03 19:53:55 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-//Pourrait etre staitc non ? Si oui retirer proto .h
+//Pourrait etre static non ? Si oui retirer proto .h
 long    ft_time(struct timeval time)
 {
 	long	res;
@@ -21,6 +21,7 @@ long    ft_time(struct timeval time)
 	return (res);
 }
 
+//static ? Si non ajouter proto dans .h
 void	ft_sleep(long usec)
 {
 	struct timeval	time;
@@ -131,6 +132,10 @@ void *ft_philos(void *arg)
         ft_setlong(&philo->dt->l_meal, &philo->last_meal, ft_time(time));
         //UNUSED ARGUMENTS
         ft_write(philo, 0, NULL);
+        
+
+        //IL FAUT INCORPORER t_eat en utilisant un mutex (si on veut le faire apparaitre pour checker)
+        //Sinon datarace entre eux tous.
         
         pthread_mutex_unlock(philo->f_fork);
         pthread_mutex_unlock(philo->s_fork);
