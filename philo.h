@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/27 16:54:18 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/03 14:02:15 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ typedef struct s_data
     long            t_die;
     long            t_eat;
     long            t_sleep;
-    long            t_think;
     long            many_eat;
     t_mut           mut_start;
     t_mut           mut_stdout;
@@ -78,5 +77,13 @@ void        ft_setint(t_mut *mut_, int *to_set, int value);
 void        ft_setlong(t_mut *mut_, long *to_set, long value);
 int         ft_getint(t_mut *mut_, int *to_get);
 long        ft_getlong(t_mut *mut_, long *to_get);
+
+//ft_inidt.c
+t_data  *ft_inidt(int ac, char **av);
+
+//simulation.c
+void *ft_monitor(void *arg);
+void *ft_philos(void *arg);
+
 
 #endif

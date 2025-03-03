@@ -6,25 +6,23 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/02/27 17:57:44 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/03 14:01:48 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-//Faire peter malloc et init a differents endroits pour voir si les protections sont bonnes
+//1mettre au propre
 
+//2 faire le temps
+
+//                  SUR ORDI LENT
 //J'ai des deadlocks parfois (depuis que j'ai mis while (1)) : Un thread bloque une ressource
 //et attend une autre qui est déjà prise par un autre thread.
 //Aucun thread ne peut progresser car ils attendent tous indéfiniment.
 //HYPOTHESES : certains threads attendent d'avoir acces a dt->start et en meme temps ont
 //des fourchettes, et en meme temps ont des fourchettes ce qui empeche les autres de
 //continuer.
-
-//1mettre au propre
-
-//2 faire le temps
-
 
 void    ft_exit(char *to_write)
 {
@@ -39,224 +37,57 @@ void    ft_exit(char *to_write)
     
 }
 
-void    ft_freeall(t_data *dt, t_philo *lst_philo, char *str)
+void    ft_freephilo(t_data *dt)
 {
-    if (lst_philo)
+    t_philo *temp;
+    t_philo *curr_;
+    
+    curr_ = dt->philos;
+    while (curr_)
     {
-        
+        temp = curr_;
+        curr_ = curr_->next;
+        free(temp);
+    }
+}
+
+int    ft_freeall(t_mut *forks, t_philo *lst_philo, t_data *dt, char *str)
+{
+    int     k;
+    
+    k = -1;
+    
+    if (forks)
+    {
+        //RAPPEL : l'indexage des fourchettes est bien de 0 a 199
+        //contrairement aux philo
+        while (++k < dt->nphilo)
+            pthread_mutex_destroy(&dt->forks[k]);
+        free(dt->forks);
+    }
+    if (lst_philo)
+        ft_freephilo(dt);
+    if (forks && lst_philo && dt)
+    {
+        //Si les 3 sont precise c'est qu'on est en train de
+        //tout vider
+        pthread_mutex_destroy(&dt->mut_stdout);
+        pthread_mutex_destroy(&dt->mut_start);
     }
     if (dt)
         free(dt);
     ft_exit(str);
-}
-
-void *ft_monitor(void *arg)
-{
-    t_data          *dt;
-
-    dt = (t_data *)arg;
-    //Le temps que tous les autres threads aient ete cree
-    pthread_mutex_lock(&dt->mut_stdout);
-    printf("Monitor start ...\n");
-    pthread_mutex_unlock(&dt->mut_stdout);
-    //Le monitor est cree apres les philos, ils attendent l'avale du monitor pour commencer...
-    ft_setint(&dt->mut_start, &dt->start, 1);
-    pthread_mutex_lock(&dt->mut_stdout);
-    printf("Tous les threads sont prets, lancement de la simulation ...\n");
-    pthread_mutex_unlock(&dt->mut_stdout);
-    //A la place du usleep on check si un philo a pris trop de temps
-    //entre son last meal et quand il commence a manger
-    usleep(10000);
-    ft_setint(&dt->mut_start, &dt->start, 0);
-    //Checker le temps que prend chaque philo en permanence
-    return (NULL);
-}
-
-void *ft_philos(void *arg)
-{
-    t_philo *philo = (t_philo *)arg;
-    int     rr;
-
-    // Les threads impairs attendent un peu pour éviter la compétition immédiate
-    //USELESS ? askip non pour un grand nb de mutex et sur les machines lentes
-
-    //Tant que la dummy start (protege par un mutex) est a 0 on attend 10 millisecondes
-    while (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
-        usleep(5);
-    if (philo->id % 2 != 0)
-        usleep(20);
-    rr = 0; 
-    //while (rr < 2)
-    //{
-        ///////////////////////////////////////////////// MANGER
-        if (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
-            return (NULL);
-
-        //ATTENTION LES DATARACE peuvent etre provoque par des lectures non proteges d'une meme variable.
-        //Ex je pourrai avoir un souci de datarace dans le futur si 2 threads lisent  les memes adresses de fourchettes
-        //car je les ai pas protege
-        pthread_mutex_lock(&philo->dt->mut_stdout);
-        printf("(start %d)Thread [%d] id : %lu    dt = %p a pris 2 fourchettes et mange. (f_fork: %p, s_fork: %p)\n", ft_getint(&philo->dt->mut_start, &philo->dt->start),
-            philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
-        pthread_mutex_unlock(&philo->dt->mut_stdout);
-
-        pthread_mutex_lock(philo->s_fork);
-        pthread_mutex_lock(philo->f_fork);
-        //Pour chaque philo, je regarde l'heure a laquelle il commence a manger.
-        //Un monitor compare l'heure actuelle avec l'heure a laquelle il a mange pour la derniere fois (last_meal est dans dt)
-        //et si le monitor constate que la deadline est depassee alors il met une dummy a 1 dans dt, et tous les threads ayant
-        //acces a cette dummy s'arretent.
-
-        usleep(600);//Temps durant lequel il mange
-
-        pthread_mutex_unlock(philo->f_fork);
-        pthread_mutex_unlock(philo->s_fork);
-
-        if (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
-            return (NULL);
-
-        pthread_mutex_lock(&philo->dt->mut_stdout);
-        printf("(start %d)Thread [%d] id : %lu    dt = %p a fini de manger. (f_fork: %p, s_fork: %p)\n", ft_getint(&philo->dt->mut_start, &philo->dt->start),
-            philo->id, (unsigned long)pthread_self(), philo->dt, (void *)philo->f_fork, (void *)philo->s_fork);
-        pthread_mutex_unlock(&philo->dt->mut_stdout);
-
-        ///////////////////////////////////////////////////////
-    
-        /////////////////////// DORMIR
-        if (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
-            return (NULL);
-        pthread_mutex_lock(&philo->dt->mut_stdout);
-        printf("Thread [%d] id : %lu dort pendant %dms.\n",
-            philo->id, (unsigned long)pthread_self(), 600);
-        pthread_mutex_unlock(&philo->dt->mut_stdout);
-        usleep(600);
-        ///////////////////////
-        rr++;
-    //}
-    
-    
-    return (NULL);
-}
-
-t_mut   *ft_initforks(t_data *dt)
-{
-    t_mut   *forks;
-    int     i;
-
-    //l'indexage des fourchettes est bien de 0 a 199 contrairement aux philos
-    forks = malloc(sizeof(t_mut) * dt->nphilo);
-    if (!forks)
-    {
-        free(dt);
-        ft_exit(MEM_FAIL);
-    }
-    i = -1;
-    while (++i < dt->nphilo)
-    {
-        //Chaque fourchette est un mutex et seul le tableau est * (malloce) donc on fait
-        //la meme chose pour mut_stdout et mut_start (ils deviennent juste des mutex)
-        // pthread_mutex_init(&forks[i], NULL);
-        if (pthread_mutex_init(&forks[i], NULL))
-        {
-            while (--i >= 0)
-                pthread_mutex_destroy(&forks[i]);
-            free(forks);
-            pthread_mutex_destroy(&dt->mut_start);
-            pthread_mutex_destroy(&dt->mut_stdout);
-            free(dt);
-            ft_exit(MUT_FAIL);
-        }
-    }
-    return (forks);
-}
-
-t_data  *ft_inidt(int ac, char **av)
-{
-    t_data  *dt;
-    
-    dt = malloc(sizeof(t_data));
-    if (!dt)
-        ft_exit(MEM_FAIL);
-    //ft_freeall pour gagner des lignes
-    if (pthread_mutex_init(&dt->mut_start, NULL))
-    {
-        free(dt);
-        ft_exit(MUT_FAIL);
-    }
-    if (pthread_mutex_init(&dt->mut_stdout, NULL))
-    {
-        pthread_mutex_destroy(&dt->mut_start);
-        free(dt);
-        ft_exit(MUT_FAIL); 
-    }
-    dt->nphilo = ft_atol(av[1]);
-    dt->t_die = ft_atol(av[2]);
-    dt->t_eat = ft_atol(av[3]);
-    dt->t_sleep = ft_atol(av[4]);
-    // dt->t_think non initialise
-    if (ac == 6)
-        dt->many_eat = ft_atol(av[5]);
-    else
-        dt->many_eat = -1;
-    dt->forks = ft_initforks(dt);
-    dt->start = 0;
-    return (dt);
-}
-
-void    ft_dispatch(t_philo *new_philo, t_data *dt, int j)
-{
-    if (new_philo->id % 2 == 0)
-    {
-        new_philo->f_fork = &dt->forks[j - 1];
-        new_philo->s_fork = &dt->forks[j % dt->nphilo];
-    }   
-    else
-    {
-        new_philo->s_fork = &dt->forks[j - 1];
-        new_philo->f_fork = &dt->forks[j % dt->nphilo];
-    }
+    return (0);
 }
 
 int main(int ac, char **av)
 {
     t_data   *dt;
+    t_philo *curr;
 
     dt = ft_inidt(ac, ft_parser(ac, av));
-
-    /////////initphilos(dt) : a la fin lst est arime a dt via dt->philos;
-    //L'INDICE DES PHILOS PART DE 1
-    //On peut pas rassembler les 3 t_philos* dans un tableau de pointeurs ??
     
-    //On initialise les philos apres dt comme ca on peut faire new_node->dt = dt;
-    t_philo *lst;
-    t_philo *new_philo;
-    t_philo *current;
-    int      j;
-    
-    lst = NULL;
-    j = 0;
-    while (++j <= dt->nphilo)
-    {
-        new_philo = malloc(sizeof(t_philo));
-        new_philo->dt = dt;
-        new_philo->id = j;
-        ft_dispatch(new_philo, dt, j);
-        new_philo->next = NULL;
-        if (!lst)
-            lst = new_philo;
-        else
-            current->next = new_philo;
-        current = new_philo;
-    }
-
-    // dt->philos = ft_initphilos(dt);
-
-
-    
-    ////////////////////////////Lancement simulation
-    t_philo *curr;
-    
-    curr = lst;
+    curr = dt->philos;
     while (curr)
     {
         pthread_create(&curr->thread, NULL, ft_philos, (void*)curr);
@@ -266,38 +97,11 @@ int main(int ac, char **av)
     //Le monitor met start a 1 et mesure l'heure pour savoir quand la simulation commence
     pthread_create(&dt->monit, NULL, ft_monitor, dt);
     pthread_join(dt->monit, NULL);
-    curr = lst;
+    curr = dt->philos;
     while (curr)
     {
         pthread_join(curr->thread, NULL);
         curr = curr->next;
     }
-
-
-    //////////////////Fin de simulation
-    t_philo *temp;
-    t_philo *curr_;
-    int     k;
-    
-    k = -1;
-    //RAPPEL : l'indexage des fourchettes est bien de 0 a 199
-    //contrairement aux philos
-    while (++k < dt->nphilo)
-    {
-        pthread_mutex_destroy(&dt->forks[k]);
-    }
-    free(dt->forks);
-    
-    curr_ = lst;
-    while (curr_)
-    {
-        temp = curr_;
-        curr_ = curr_->next;
-        free(temp);
-    }
-    pthread_mutex_destroy(&dt->mut_stdout);
-    pthread_mutex_destroy(&dt->mut_start);
-    free(dt);
-    
-    return (0);
+    return (ft_freeall(dt->forks, dt->philos, dt, NULL));
 }
