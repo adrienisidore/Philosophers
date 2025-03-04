@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:57:39 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/03 17:16:58 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/04 15:32:24 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,11 @@ static t_mut   *ft_initforks(t_data *dt)
     //l'indexage des fourchettes est bien de 0 a 199 contrairement aux philos
     forks = malloc(sizeof(t_mut) * dt->nphilo);
     if (!forks)
-        ft_freeall(NULL, NULL, dt, MEM_FAIL);
+    {
+        ft_destroy(&dt->mut_stdout, &dt->mut_start,
+            &dt->mut_lastmeal, &dt->mut_nbmeal);
+        ft_freeall(NULL, NULL, dt, MEM_FAIL);   
+    }
     i = -1;
     while (++i < dt->nphilo)
     {
@@ -32,8 +36,9 @@ static t_mut   *ft_initforks(t_data *dt)
             while (--i >= 0)
                 pthread_mutex_destroy(&forks[i]);
             free(forks);
-            pthread_mutex_destroy(&dt->mut_start);
-            pthread_mutex_destroy(&dt->mut_stdout);
+            ft_destroy(&dt->mut_stdout, &dt->mut_start,
+                &dt->mut_lastmeal, &dt->mut_nbmeal);
+            pthread_mutex_destroy(&dt->mut_startime);
             ft_freeall(NULL, NULL, dt, MUT_FAIL);
         }
     }
@@ -82,13 +87,8 @@ static t_philo  *ft_initphilo(t_data *dt)
     return (lst);
 }
 
-t_data  *ft_inidt(int ac, char **av)
+static void ft_initmutex(t_data *dt)
 {
-    t_data          *dt;
-    
-    dt = malloc(sizeof(t_data));
-    if (!dt)
-        ft_exit(MEM_FAIL);
     if (pthread_mutex_init(&dt->mut_start, NULL))
         ft_freeall(NULL, NULL, dt, MUT_FAIL);
     if (pthread_mutex_init(&dt->mut_stdout, NULL))
@@ -96,12 +96,33 @@ t_data  *ft_inidt(int ac, char **av)
         pthread_mutex_destroy(&dt->mut_start);
         ft_freeall(NULL, NULL, dt, MUT_FAIL); 
     }
-    if (pthread_mutex_init(&dt->l_meal, NULL))
+    if (pthread_mutex_init(&dt->mut_lastmeal, NULL))
     {
-        pthread_mutex_destroy(&dt->mut_stdout);
-        pthread_mutex_destroy(&dt->mut_start);
+        ft_destroy(&dt->mut_stdout, &dt->mut_start, NULL, NULL);
         ft_freeall(NULL, NULL, dt, MUT_FAIL); 
     }
+    if (pthread_mutex_init(&dt->mut_nbmeal, NULL))
+    {
+        ft_destroy(&dt->mut_stdout, &dt->mut_start,
+            &dt->mut_lastmeal, NULL);
+        ft_freeall(NULL, NULL, dt, MUT_FAIL); 
+    }
+    if (pthread_mutex_init(&dt->mut_startime, NULL))
+    {
+        ft_destroy(&dt->mut_stdout, &dt->mut_start,
+            &dt->mut_lastmeal, &dt->mut_nbmeal);
+        ft_freeall(NULL, NULL, dt, MUT_FAIL); 
+    }
+}
+
+t_data  *ft_inidt(int ac, char **av)
+{
+    t_data          *dt;
+    
+    dt = malloc(sizeof(t_data));
+    if (!dt)
+        ft_exit(MEM_FAIL);
+    ft_initmutex(dt);
     dt->nphilo = ft_atol(av[1]);
     dt->t_die = ft_atol(av[2]);
     dt->t_eat = ft_atol(av[3]);
