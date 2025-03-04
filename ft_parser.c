@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:44 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/03 19:46:20 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/04 19:30:07 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,13 +73,13 @@ char **ft_parser(int ac, char **av)
     {
         //Si les philos ne doivent pas manger
         // write(1, "\n", 2);
-        exit (0);
+        exit (0);//exit interdit !
     }
-    if (ft_atol(av[1]) == 1)
-    {
-        //Si y'a qu'un seul philo
-        write(1, "timestamp_in_ms 1 has taken a fork\n", 36);
-        exit (0);
-    }
+    // if (ft_atol(av[1]) == 1)
+    // {
+    //     //Si y'a qu'un seul philo
+    //     write(1, "timestamp_in_ms 1 has taken a fork\n", 36);
+    //     exit (0);
+    // }
     return (av);
 }

@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/04 15:40:06 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/04 19:42:09 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,7 @@
 
 //implementer tout le reste
 
-//GERER LE CAS OU 1 philo, 0 philo et ;any_meal == 0 (ils doivent pas manger);
 
-//                  SUR ORDI LENT
-//J'ai des deadlocks parfois (depuis que j'ai mis while (1)) : Un thread bloque une ressource
-//et attend une autre qui est déjà prise par un autre thread.
-//Aucun thread ne peut progresser car ils attendent tous indéfiniment.
-//HYPOTHESES : certains threads attendent d'avoir acces a dt->start et en meme temps ont
-//des fourchettes, et en meme temps ont des fourchettes ce qui empeche les autres de
-//continuer.
 
 void    ft_exit(char *to_write)
 {

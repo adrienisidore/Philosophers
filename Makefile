@@ -6,7 +6,7 @@
 #    By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/11 11:40:55 by aisidore          #+#    #+#              #
-#    Updated: 2025/03/04 15:15:05 by aisidore         ###   ########.fr        #
+#    Updated: 2025/03/04 19:41:37 by aisidore         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ OBJ = $(OBJ_DIR)/ft_inidt.o \
 	  $(OBJ_DIR)/ft_parser.o \
 	  $(OBJ_DIR)/setget.o \
 	  $(OBJ_DIR)/sim.o \
-	  $(OBJ_DIR)/utils.o \
+	  $(OBJ_DIR)/utils.o
 	  
 
 FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
