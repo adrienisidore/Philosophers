@@ -6,11 +6,15 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/04 19:42:09 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/04 20:03:37 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+//chmod 777 test.sh (dans le repo thales ?)
+//NE PASCOMPILER AVEC SANITIZE
+//./test.sh ../Philosophers/ 1
 
 //Retracer raisonnement Erika du debut a la fin et ajouter les elements manquants puis tester
 

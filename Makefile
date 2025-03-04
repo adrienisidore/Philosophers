@@ -6,7 +6,7 @@
 #    By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/11 11:40:55 by aisidore          #+#    #+#              #
-#    Updated: 2025/03/04 19:41:37 by aisidore         ###   ########.fr        #
+#    Updated: 2025/03/04 20:01:22 by aisidore         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,8 +28,8 @@ OBJ = $(OBJ_DIR)/ft_inidt.o \
 	  $(OBJ_DIR)/utils.o
 	  
 
-FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
-# FL = -Wall -Wextra -Werror -pthread
+# FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
+FL = -Wall -Wextra -Werror -pthread
 
 all: philo
 
