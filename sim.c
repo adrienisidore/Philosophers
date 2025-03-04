@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:59:46 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/04 15:35:02 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/04 15:56:38 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ static void	ft_putstr_fd(char *str)
 void	ft_write(t_philo *philo, int id, char *str)
 {
 	struct timeval	time;//On en a besoin pour recuperer la valeur de last_meal
-	long			curr_time;
 
     (void)id;
     (void)str;
@@ -68,11 +67,15 @@ void	ft_write(t_philo *philo, int id, char *str)
         exit (1);   
     }
     gettimeofday(&time, NULL);
-    curr_time = ft_getlong(&philo->dt->mut_lastmeal, &philo->last_meal);
-    //AVEC ft_putstr_fd :
-    ft_putstr_fd(ft_ltoa(curr_time - ft_getlong(&philo->dt->mut_startime,
-				&philo->dt->start_time)));
+    ft_putstr_fd(ft_ltoa(ft_getlong(&philo->dt->mut_lastmeal,
+        &philo->last_meal) - ft_getlong(&philo->dt->mut_startime,
+		&philo->dt->start_time)));
+    ft_putstr_fd(" ");
+    ft_putstr_fd(ft_ltoa((long) id));
+    ft_putstr_fd(" ");
+    ft_putstr_fd(str);
     ft_putstr_fd("\n");
+    //Erika utilise un flag pour arreter d'ecrire
     pthread_mutex_unlock(&philo->dt->mut_stdout);
 
 }
@@ -81,9 +84,25 @@ void	ft_write(t_philo *philo, int id, char *str)
 //alors on arrete la simulation ou alors on remet i a 0 et all_full a 0. Sinon i++
 //ft_next
 
-//D'abord incorporer ft_sleep etc dans mon code et faire des tests
+// static void     ft_next(t_philo **ptr_curr, t_data *dt, int *being_full)
+// {
+//     //Si on a atteint le dernier noeud
+//     if ((*ptr_curr)->next == NULL)
+//     {
+//         //On check si tous les philos sont pleins (il y a nphilo qui sont full).
+//         //Si c'est pas le cas on recommence
+//         if (*being_full == dt->nphilo)
+//             ft_setint(&dt->mut_start, &dt->start, 0);
+//         else
+//         {
+//             *ptr_curr = dt->philos;
+//             *being_full = 0;
+//         }
+//     }
+//     else
+//         *ptr_curr = (*ptr_curr)->next;
+// }
 
-//Initialiser mut_nbmeal et le detruire
 void *ft_monitor(void *arg)
 {
     t_data          *dt;
@@ -122,7 +141,7 @@ void *ft_monitor(void *arg)
     //     if (dt->many_eat != -1 && ft_getlong(&dt->mut_nbmeal,
     //         &curr->nb_meal) > dt->many_eat)
     //         being_full++;
-    //     ft_next(curr, dt, &being_full);//A CODER
+    //     ft_next(&curr, dt, &being_full);//A CODER
     // }
 
 

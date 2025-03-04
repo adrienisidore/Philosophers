@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/04 15:33:43 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/04 15:40:06 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 //Retracer raisonnement Erika du debut a la fin et ajouter les elements manquants puis tester
 
-//1mettre au propre
+//1finir ft_write
 
-//2 faire le temps
+//implementer tout le reste
 
 //GERER LE CAS OU 1 philo, 0 philo et ;any_meal == 0 (ils doivent pas manger);
 
