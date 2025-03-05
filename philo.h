@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 16:13:22 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 20:32:57 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ t_data		*ft_inidt(int ac, char **av);
 //sim_utils.c
 void		ft_write(t_philo *philo, int id, char *str);
 void		ft_think(t_data *dt);
-void		ft_sleep(long usec);
+void		ft_sleep(long usec, t_data *dt);
 long		ft_time(struct timeval time);
 
 //sim.c

@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:59:46 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 19:16:30 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 21:33:37 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ static void	ft_next(t_philo **ptr_curr, t_data *dt, int *being_full)
 	}
 	else
 		*ptr_curr = (*ptr_curr)->next;
-	usleep(100);
+	// usleep(100);
+	// usleep(10);//decharger CPU
 }
 
 static void	ft_check(t_data *dt, t_philo *curr, int *being_full)
@@ -65,7 +66,7 @@ void *ft_monitor(void *arg)
 		curr = curr->next;
 	}
 	ft_setint(&dt->mut_start, &dt->start, 1);
-	ft_sleep(50);
+	ft_sleep(50, dt);
 	curr = dt->philos;
 	while (ft_getint(&dt->mut_start, &dt->start))
 	{
@@ -124,7 +125,7 @@ static void	ft_eat(t_philo *philo)
 	gettimeofday(&time, NULL);
 	ft_setlong(&philo->dt->mut_lastmeal, &philo->last_meal, ft_time(time));
 	ft_write(philo, philo->id, "is eating\n");
-	ft_sleep(philo->dt->t_eat);
+	ft_sleep(philo->dt->t_eat, philo->dt);
 	pthread_mutex_lock(&philo->dt->mut_nbmeal);
 	philo->nb_meal++;
 	pthread_mutex_unlock(&philo->dt->mut_nbmeal);
@@ -138,21 +139,21 @@ void	*ft_philos(void *arg)
 
 	philo = (t_philo *)arg;
 	while (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
-		ft_sleep(1);
+		usleep(20);//ft_sleep(1, philo->dt);
 	if (philo->dt->nphilo == 1)
 	{
 		ft_write(philo, philo->id, "has taken a fork\n");
 		return (NULL);
 	}
 	if (philo->id % 2 != 0)
-		ft_sleep(30);
+		ft_sleep(30, philo->dt);
 	while (ft_getint(&philo->dt->mut_start, &philo->dt->start))
 	{
 		ft_eat(philo);
 		ft_write(philo, philo->id, "is sleeping\n");
-		ft_sleep(philo->dt->t_sleep);
+		ft_sleep(philo->dt->t_sleep, philo->dt);
 		ft_write(philo, philo->id, "is thinking\n");
-		// ft_think(philo->dt);
+		ft_think(philo->dt);
 	}
 	return (NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:04 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 16:40:44 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 21:19:56 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ long int	ft_atol(const char *str)
 			// i++;
 			if (r > INT_MAX)
 			{
-				ft_exit(INV_ARG);
+				// ft_exit(INV_ARG);
 				return (-1);
 			}
 	}

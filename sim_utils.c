@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 11:57:52 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 19:25:41 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 20:54:25 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ long	ft_time(struct timeval time)
 	return (res);
 }
 
-void	ft_sleep(long usec)
+void	ft_sleep(long usec, t_data *dt)
 {
 	struct timeval	time;
 	long			curr_time;
@@ -34,7 +34,8 @@ void	ft_sleep(long usec)
 		curr_time = time.tv_sec * 1000 + time.tv_usec / 1000;
 		if (curr_time - begin < usec)
 		{
-			//Gerer cas temps long yasmine
+			if (!ft_getint(&dt->mut_start, &dt->start))
+				break ;
 			usleep(500);	
 		}
 		else
@@ -42,17 +43,19 @@ void	ft_sleep(long usec)
 	}
 }
 
-// void	ft_think(t_data *dt)
-// {
-// 	long	time;
+void	ft_think(t_data *dt)
+{
+	long	time;
 
-// 	if (dt->nphilo % 2 == 0)
-// 		return ;
-// 	time = dt->t_eat * 2 - dt->t_sleep;
-// 	if (time < 0)
-// 		time = 0;
-// 	ft_sleep(time);
-// }
+	if (dt->nphilo % 2 == 0)
+		return ;
+	time = dt->t_eat * 2 - dt->t_sleep;
+	if (time < 0)
+		time = 0;
+	ft_sleep(time, dt);
+	// (void)dt;
+	// usleep(1000);
+}
 
 static void	ft_putstr_fd(char *str)
 {

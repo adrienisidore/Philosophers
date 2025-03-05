@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:44 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 18:13:20 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 21:18:33 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,11 @@ char	**ft_parser(int ac, char **av)
 	{
 		if (ft_checkint(av[i], i))
 			return (NULL);
+	}
+	if (ft_atol(av[1]) < 1 || ft_atol(av[1]) > 200)
+	{
+		ft_exit(INV_ARG);
+		return (NULL);
 	}
 	if (ac == 6 && ft_atol(av[5]) == 0)
 		return (NULL);
