@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 13:49:23 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 16:13:22 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ typedef struct s_data
 }	t_data;
 
 //main.c
-void		ft_exit(char *to_write);
+int			ft_exit(char *to_write);
 void		ft_destroy(t_mut *mut1, t_mut *mut2, t_mut *mut3, t_mut *mut4);
 int			ft_freeall(t_mut *forks, t_philo *lst_philo, t_data *dt, char *str);
 

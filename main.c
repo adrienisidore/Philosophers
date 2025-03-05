@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 13:30:19 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 16:14:47 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,16 @@
 
 
 
-void    ft_exit(char *to_write)
+int    ft_exit(char *to_write)
 {
     if (to_write)
     {
         write(2, to_write, ft_strlen(to_write));
-        //L'exit code doit il changer en fonction de ce qui pete ?
-        exit(1);
-    }   
-    //L'exit code doit il changer en fonction de ce qui pete ?
-    exit(0);
-    
+		exit(1);
+		return (1);
+    }
+	exit(0);
+	return (0);   
 }
 
 void   ft_destroy(t_mut *mut1, t_mut *mut2, t_mut *mut3, t_mut *mut4)
@@ -90,24 +89,25 @@ int    ft_freeall(t_mut *forks, t_philo *lst_philo, t_data *dt, char *str)
 
 int main(int ac, char **av)
 {
-    t_data   *dt;
-    t_philo *curr;
+	t_data   *dt;
+	t_philo *curr;
 
-    dt = ft_inidt(ac, ft_parser(ac, av));
-    
-    curr = dt->philos;
-    while (curr)
-    {
-        pthread_create(&curr->thread, NULL, ft_philos, (void*)curr);
-        curr = curr->next;
-    }
-    pthread_create(&dt->monit, NULL, ft_monitor, dt);
-    pthread_join(dt->monit, NULL);
-    curr = dt->philos;
-    while (curr)
-    {
-        pthread_join(curr->thread, NULL);
-        curr = curr->next;
-    }
-    return (ft_freeall(dt->forks, dt->philos, dt, NULL));
+	if (!ft_parser(ac, av))
+		return (0);
+	dt = ft_inidt(ac, ft_parser(ac, av));
+	curr = dt->philos;
+	while (curr)
+	{
+		pthread_create(&curr->thread, NULL, ft_philos, (void*)curr);
+		curr = curr->next;
+	}
+	pthread_create(&dt->monit, NULL, ft_monitor, dt);
+	pthread_join(dt->monit, NULL);
+	curr = dt->philos;
+	while (curr)
+	{
+		pthread_join(curr->thread, NULL);
+		curr = curr->next;
+	}
+	return (ft_freeall(dt->forks, dt->philos, dt, NULL));
 }
