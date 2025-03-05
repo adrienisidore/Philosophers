@@ -6,11 +6,10 @@
 #    By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/11 11:40:55 by aisidore          #+#    #+#              #
-#    Updated: 2025/03/05 12:01:27 by aisidore         ###   ########.fr        #
+#    Updated: 2025/03/05 17:11:15 by aisidore         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-# Si je modifie le Makefile alors "make" ne crame pas qu'il a change
 OBJ_DIR = objets
 
 SRC = ft_inidt.c \
@@ -28,7 +27,6 @@ OBJ = $(OBJ_DIR)/ft_inidt.o \
 	  $(OBJ_DIR)/sim_utils.o \
 	  $(OBJ_DIR)/sim.o \
 	  $(OBJ_DIR)/utils.o
-	  
 
 # FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
 FL = -Wall -Wextra -Werror -pthread

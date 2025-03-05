@@ -6,28 +6,28 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 13:52:55 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 16:07:44 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 18:06:46 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void    ft_setint(t_mut *mut_, int *to_set, int value)
-{ 
+void	ft_setint(t_mut *mut_, int *to_set, int value)
+{
 	pthread_mutex_lock(mut_);
 	*to_set = value;
 	pthread_mutex_unlock(mut_);
 }
-void    ft_setlong(t_mut *mut_, long *to_set, long value)
-{ 
+void	ft_setlong(t_mut *mut_, long *to_set, long value)
+{
 	pthread_mutex_lock(mut_);
 	*to_set = value;
 	pthread_mutex_unlock(mut_);
 }
 
-int    ft_getint(t_mut *mut_, int *to_get)
+int	ft_getint(t_mut *mut_, int *to_get)
 {
-	int    res;
+	int	res;
 
 	pthread_mutex_lock(mut_);
 	res = *to_get;
@@ -35,9 +35,9 @@ int    ft_getint(t_mut *mut_, int *to_get)
 	return (res);
 }
 
-long    ft_getlong(t_mut *mut_, long *to_get)
+long	ft_getlong(t_mut *mut_, long *to_get)
 {
-	long    res;
+	long	res;
 
 	pthread_mutex_lock(mut_);
 	res = *to_get;
