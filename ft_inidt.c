@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:57:39 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/04 15:32:24 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 13:22:50 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ static t_philo  *ft_initphilo(t_data *dt)
         if (!new_philo)
             ft_freeall(dt->forks, dt->philos, dt, MEM_FAIL);
         new_philo->dt = dt;
-        new_philo->nb_meal = dt->many_eat;
+        new_philo->nb_meal = 0; // dt->many_eat;
         new_philo->id = j;
         ft_dispatch(new_philo, dt, j);
         new_philo->next = NULL;
