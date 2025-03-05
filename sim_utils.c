@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 11:57:52 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 18:34:26 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 19:25:41 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,23 +33,26 @@ void	ft_sleep(long usec)
 		gettimeofday(&time, NULL);
 		curr_time = time.tv_sec * 1000 + time.tv_usec / 1000;
 		if (curr_time - begin < usec)
-			usleep(500);
+		{
+			//Gerer cas temps long yasmine
+			usleep(500);	
+		}
 		else
 			break ;
 	}
 }
 
-void	ft_think(t_data *dt)
-{
-	long	time;
+// void	ft_think(t_data *dt)
+// {
+// 	long	time;
 
-	if (dt->nphilo % 2 == 0)
-		return ;
-	time = dt->t_eat * 2 - dt->t_sleep;
-	if (time < 0)
-		time = 0;
-	ft_sleep(time);
-}
+// 	if (dt->nphilo % 2 == 0)
+// 		return ;
+// 	time = dt->t_eat * 2 - dt->t_sleep;
+// 	if (time < 0)
+// 		time = 0;
+// 	ft_sleep(time);
+// }
 
 static void	ft_putstr_fd(char *str)
 {

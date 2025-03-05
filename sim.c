@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:59:46 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 18:34:19 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 19:16:30 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,14 @@ static void	ft_check(t_data *dt, t_philo *curr, int *being_full)
 	if (ft_time(time) - ft_getlong(&dt->mut_lastmeal,
 		&curr->last_meal) > dt->t_die)
 	{
-		printf("time die : %lu\n", ft_time(time) - dt->start_time);
+		// printf("time die : %lu\n", ft_time(time) - dt->start_time);
 		ft_write(curr, curr->id, "died\n");
 		ft_setint(&dt->mut_start, &dt->start, 0);
 	}
 	if (dt->many_eat != -1 && ft_getlong(&dt->mut_nbmeal,
 		&curr->nb_meal) > dt->many_eat)
 		(*being_full)++;
+	// printf("philo %d a mange %ld fois\n", curr->id, curr->nb_meal);
 }
 
 void *ft_monitor(void *arg)
@@ -151,7 +152,7 @@ void	*ft_philos(void *arg)
 		ft_write(philo, philo->id, "is sleeping\n");
 		ft_sleep(philo->dt->t_sleep);
 		ft_write(philo, philo->id, "is thinking\n");
-		ft_think(philo->dt);
+		// ft_think(philo->dt);
 	}
 	return (NULL);
 }

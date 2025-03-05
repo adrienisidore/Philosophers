@@ -6,16 +6,15 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:57:39 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 16:51:14 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/05 19:09:07 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static t_mut	*ft_initforks(t_data *dt)
+static t_mut	*ft_mallocforks(t_data *dt)
 {
 	t_mut	*forks;
-	int		i;
 
 	forks = malloc(sizeof(t_mut) * dt->nphilo);
 	if (!forks)
@@ -25,6 +24,25 @@ static t_mut	*ft_initforks(t_data *dt)
 		ft_freeall(NULL, NULL, dt, MEM_FAIL);
 		return (NULL);
 	}
+	return (forks);
+}
+// forks = malloc(sizeof(t_mut) * dt->nphilo);
+	// if (!forks)
+	// {
+	// 	ft_destroy(&dt->mut_stdout, &dt->mut_start,
+	// 		&dt->mut_lastmeal, &dt->mut_nbmeal);
+	// 	ft_freeall(NULL, NULL, dt, MEM_FAIL);
+	// 	return (NULL);
+	// }
+static t_mut	*ft_initforks(t_data *dt)
+{
+	t_mut	*forks;
+	int		i;
+
+	//
+	forks = ft_mallocforks(dt);
+	if (!forks)
+		return (NULL);
 	i = -1;
 	while (++i < dt->nphilo)
 	{
