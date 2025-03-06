@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 17:01:09 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/06 17:02:24 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 19:08:40 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	ft_exit(char *to_write)
 		write(2, to_write, ft_strlen(to_write));
 		return (1);
 	}
-	return (0);   
+	return (0);
 }
 
 void	ft_destroy(t_mut *mut1, t_mut *mut2, t_mut *mut3, t_mut *mut4)
@@ -38,7 +38,7 @@ static void	ft_freephilo(t_data *dt)
 {
 	t_philo	*temp;
 	t_philo	*curr_;
-	
+
 	curr_ = dt->philos;
 	while (curr_)
 	{
@@ -51,7 +51,7 @@ static void	ft_freephilo(t_data *dt)
 int	ft_freeall(t_mut *forks, t_philo *lst_philo, t_data *dt, char *str)
 {
 	int	k;
-	
+
 	k = -1;
 	if (forks)
 	{
@@ -70,4 +70,21 @@ int	ft_freeall(t_mut *forks, t_philo *lst_philo, t_data *dt, char *str)
 	if (dt)
 		free(dt);
 	return (ft_exit(str));
+}
+
+int	ft_fail(t_data *dt, t_philo *curr)
+{
+	t_philo	*failed;
+
+	failed = curr;
+	curr = dt->philos;
+	ft_setint(&dt->mut_fail, &dt->fail, 1);
+	while (curr != failed)
+	{
+		pthread_join(curr->thread, NULL);
+		curr = curr->next;
+	}
+	pthread_mutex_destroy(&dt->mut_fail);
+	ft_freeall(dt->forks, dt->philos, dt, NULL);
+	return (ft_exit(TH_FAIL));
 }

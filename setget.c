@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 13:52:55 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 18:06:46 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 18:06:49 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void	ft_setint(t_mut *mut_, int *to_set, int value)
 	*to_set = value;
 	pthread_mutex_unlock(mut_);
 }
+
 void	ft_setlong(t_mut *mut_, long *to_set, long value)
 {
 	pthread_mutex_lock(mut_);

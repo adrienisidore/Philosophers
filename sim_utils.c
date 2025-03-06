@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 11:57:52 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/06 16:25:39 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 18:07:19 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	ft_sleep(long usec, t_data *dt)
 		{
 			if (!ft_getint(&dt->mut_start, &dt->start))
 				break ;
-			usleep(500);	
+			usleep(500);
 		}
 		else
 			break ;

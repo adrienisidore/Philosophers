@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:59:46 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/06 16:36:08 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 18:12:01 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,28 +28,26 @@ static void	ft_next(t_philo **ptr_curr, t_data *dt, int *being_full)
 	}
 	else
 		*ptr_curr = (*ptr_curr)->next;
-	usleep(100);//Reduit puissance CPU et permet a certains de manger assez de fois
+	usleep(100);
 }
 
 static void	ft_check(t_data *dt, t_philo *curr, int *being_full)
 {
-	struct timeval time;
+	struct timeval	time;
 
 	gettimeofday(&time, NULL);
-	// printf("since begin : %lu philo[%d] last meal : %lu\n", ft_time(time) - ft_getlong(&dt->mut_startime, &dt->start_time), curr->id, ft_time(time) - ft_getlong(&dt->mut_lastmeal, &curr->last_meal));
 	if (ft_time(time) - ft_getlong(&dt->mut_lastmeal,
-		&curr->last_meal) > dt->t_die)
+			&curr->last_meal) > dt->t_die)
 	{
-		// printf("since begin ; %lu", ft_time(time) - ft_getlong(&dt->mut_startime, &dt->start_time));
 		ft_write(curr, curr->id, "died\n");
 		ft_setint(&dt->mut_start, &dt->start, 0);
 	}
 	if (dt->many_eat != -1 && ft_getlong(&dt->mut_nbmeal,
-		&curr->nb_meal) > dt->many_eat)
+			&curr->nb_meal) > dt->many_eat)
 		(*being_full)++;
 }
 
-void *ft_monitor(void *arg)
+void	*ft_monitor(void *arg)
 {
 	t_data			*dt;
 	struct timeval	time;
@@ -102,8 +100,8 @@ void	*ft_philos(void *arg)
 
 	philo = (t_philo *)arg;
 	while (!ft_getint(&philo->dt->mut_start, &philo->dt->start)
-			&& !ft_getint(&philo->dt->mut_fail, &philo->dt->fail))
-		usleep(20);//&& pas de probleme. Si pb alors on arrete return (NULL);
+		&& !ft_getint(&philo->dt->mut_fail, &philo->dt->fail))
+		usleep(20);
 	if (ft_getint(&philo->dt->mut_fail, &philo->dt->fail))
 		return (NULL);
 	if (philo->dt->nphilo == 1)
