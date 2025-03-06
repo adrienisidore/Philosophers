@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:57:39 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 19:09:07 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 16:12:34 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,25 +21,18 @@ static t_mut	*ft_mallocforks(t_data *dt)
 	{
 		ft_destroy(&dt->mut_stdout, &dt->mut_start,
 			&dt->mut_lastmeal, &dt->mut_nbmeal);
+		pthread_mutex_destroy(&dt->mut_fail);
 		ft_freeall(NULL, NULL, dt, MEM_FAIL);
 		return (NULL);
 	}
 	return (forks);
 }
-// forks = malloc(sizeof(t_mut) * dt->nphilo);
-	// if (!forks)
-	// {
-	// 	ft_destroy(&dt->mut_stdout, &dt->mut_start,
-	// 		&dt->mut_lastmeal, &dt->mut_nbmeal);
-	// 	ft_freeall(NULL, NULL, dt, MEM_FAIL);
-	// 	return (NULL);
-	// }
+
 static t_mut	*ft_initforks(t_data *dt)
 {
 	t_mut	*forks;
 	int		i;
 
-	//
 	forks = ft_mallocforks(dt);
 	if (!forks)
 		return (NULL);
@@ -53,7 +46,7 @@ static t_mut	*ft_initforks(t_data *dt)
 			free(forks);
 			ft_destroy(&dt->mut_stdout, &dt->mut_start,
 				&dt->mut_lastmeal, &dt->mut_nbmeal);
-			pthread_mutex_destroy(&dt->mut_startime);
+			ft_destroy(&dt->mut_startime, &dt->mut_fail, NULL, NULL);
 			ft_freeall(NULL, NULL, dt, MUT_FAIL);
 			return (NULL);
 		}
@@ -92,6 +85,7 @@ static t_philo	*ft_initphilo(t_data *dt)
 		new_philo = malloc(sizeof(t_philo));
 		if (!new_philo)
 		{
+			pthread_mutex_destroy(&dt->mut_fail);
 			ft_freeall(dt->forks, dt->philos, dt, MEM_FAIL);
 			return (NULL);	
 		}
@@ -135,6 +129,16 @@ static int	ft_initmutex(t_data *dt)
 	return (0);
 }
 
+static void	ft_stackdt(t_data* dt, char **av)
+{
+	dt->nphilo = ft_atol(av[1]);
+	dt->t_die = ft_atol(av[2]);
+	dt->t_eat = ft_atol(av[3]);
+	dt->t_sleep = ft_atol(av[4]);
+	dt->start = 0;
+	dt->fail = 0;
+}
+
 t_data	*ft_inidt(int ac, char **av)
 {
 	t_data	*dt;
@@ -145,13 +149,14 @@ t_data	*ft_inidt(int ac, char **av)
 		ft_exit(MEM_FAIL);
 		return (NULL);	
 	}
+	if (pthread_mutex_init(&dt->mut_fail, NULL))
+	{
+		ft_freeall(NULL, NULL, dt, MUT_FAIL);
+		return (NULL);
+	}
 	if (ft_initmutex(dt))
 		return (NULL);
-	dt->nphilo = ft_atol(av[1]);
-	dt->t_die = ft_atol(av[2]);
-	dt->t_eat = ft_atol(av[3]);
-	dt->t_sleep = ft_atol(av[4]);
-	dt->start = 0;
+	ft_stackdt(dt, av);
 	if (ac == 6)
 		dt->many_eat = ft_atol(av[5]);
 	else

@@ -6,11 +6,11 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 18:14:34 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 16:07:08 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//Supp executable + les .o
+//Supp executable + les .o////////////////////////////////////////////////////////////
 
 #include "philo.h"
 
@@ -73,11 +73,12 @@ int	ft_freeall(t_mut *forks, t_philo *lst_philo, t_data *dt, char *str)
 		free(dt);
 	return (ft_exit(str));
 }
-
+//Un 7eme mutex a destroy un peu partout
 int	main(int ac, char **av)
 {
 	t_data	*dt;
 	t_philo	*curr;
+	t_philo	*failed;
 
 	if (!ft_parser(ac, av))
 		return (0);
@@ -86,11 +87,36 @@ int	main(int ac, char **av)
 		return(1);
 	curr = dt->philos;
 	while (curr)
-	{
-		pthread_create(&curr->thread, NULL, ft_philos, (void*)curr);
+	{//proteger et retirer la securite [200] dans le parsing
+		if (pthread_create(&curr->thread, NULL, ft_philos, (void*)curr))
+		{
+			failed = curr;
+			curr = dt->philos;
+			while (curr != failed)
+			{
+				pthread_join(curr->thread, NULL);
+				curr = curr->next;
+			}
+			pthread_mutex_destroy(&dt->mut_fail);
+			ft_freeall(dt->forks, dt->philos, dt, NULL);
+			return (1);
+		}
+		//Si pthread pete alors il faut que les philos (et qui attendent sagement) deja crees soient detruits
 		curr = curr->next;
 	}
-	pthread_create(&dt->monit, NULL, ft_monitor, dt);
+	if (pthread_create(&dt->monit, NULL, ft_monitor, dt))
+	{
+		failed = curr;
+		curr = dt->philos;
+		while (curr != failed)
+		{
+			pthread_join(curr->thread, NULL);
+			curr = curr->next;
+		}
+		pthread_mutex_destroy(&dt->mut_fail);
+		ft_freeall(dt->forks, dt->philos, dt, NULL);
+		return (1);
+	}
 	pthread_join(dt->monit, NULL);
 	curr = dt->philos;
 	while (curr)
@@ -98,5 +124,35 @@ int	main(int ac, char **av)
 		pthread_join(curr->thread, NULL);
 		curr = curr->next;
 	}
+	pthread_mutex_destroy(&dt->mut_fail);
 	return (ft_freeall(dt->forks, dt->philos, dt, NULL));
 }
+
+// int	main(int ac, char **av)
+// {
+// 	t_data	*dt;
+// 	t_philo	*curr;
+// 	// t_philo	*failed;
+
+// 	if (!ft_parser(ac, av))
+// 		return (0);
+// 	dt = ft_inidt(ac, ft_parser(ac, av));
+// 	if (!dt || dt->forks == NULL || dt->philos == NULL)
+// 		return(1);
+// 	curr = dt->philos;
+// 	while (curr)
+// 	{//proteger et retirer la securite [200] dans le parsing
+// 		pthread_create(&curr->thread, NULL, ft_philos, (void*)curr);
+// 		//Si pthread pete alors il faut que les philos (et qui attendent sagement) deja crees soient detruits
+// 		curr = curr->next;
+// 	}
+// 	pthread_create(&dt->monit, NULL, ft_monitor, dt);
+// 	pthread_join(dt->monit, NULL);
+// 	curr = dt->philos;
+// 	while (curr)
+// 	{
+// 		pthread_join(curr->thread, NULL);
+// 		curr = curr->next;
+// 	}
+// 	return (ft_freeall(dt->forks, dt->philos, dt, NULL));
+// }

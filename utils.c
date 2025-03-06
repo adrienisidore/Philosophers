@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:04 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 21:19:56 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 11:32:47 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,9 @@ long int	ft_atol(const char *str)
 	}
 	while (str[i] >= '0' && str[i] <= '9')
 	{
-			r = r * 10 + str[i++] - '0';//i++;
-			// i++;
+			r = r * 10 + str[i++] - '0';
 			if (r > INT_MAX)
-			{
-				// ft_exit(INV_ARG);
 				return (-1);
-			}
 	}
 	return (r * sign);
 }
@@ -77,7 +73,7 @@ static int	ft_size(long nb)
 
 char	*ft_ltoa(long n)
 {
-	static char	str[100];//Possible d'avoir un nb de taille superieur a 99 caracteres ?
+	static char	str[100];
 	int			len;
 	long		nb;
 

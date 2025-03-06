@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 20:32:57 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 15:54:13 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef struct s_philo
 typedef struct s_data
 {
 	int			start;
+	int			fail;
 	long		start_time;
 	long		nphilo;
 	long		t_die;
@@ -58,6 +59,7 @@ typedef struct s_data
 	t_mut		mut_lastmeal;
 	t_mut		mut_nbmeal;
 	t_mut		mut_startime;
+	t_mut		mut_fail;
 	pthread_t	monit;
 	t_philo		*philos;
 }	t_data;

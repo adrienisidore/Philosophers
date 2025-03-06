@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 11:57:52 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/05 20:54:25 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 13:32:23 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,6 @@ void	ft_think(t_data *dt)
 	if (time < 0)
 		time = 0;
 	ft_sleep(time, dt);
-	// (void)dt;
-	// usleep(1000);
 }
 
 static void	ft_putstr_fd(char *str)
