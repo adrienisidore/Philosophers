@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/06 19:08:25 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 20:10:37 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ int	main(int ac, char **av)
 		return (0);
 	dt = ft_inidt(ac, ft_parser(ac, av));
 	if (!dt || dt->forks == NULL || dt->philos == NULL)
-		return(1);
+		return (1);
 	curr = dt->philos;
 	while (curr)
 	{
-		if (pthread_create(&curr->thread, NULL, ft_philos, (void*)curr))
+		if (pthread_create(&curr->thread, NULL, ft_philos, (void *)curr))
 			return (ft_fail(dt, curr));
 		curr = curr->next;
 	}
