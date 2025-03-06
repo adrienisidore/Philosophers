@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:59:46 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/06 15:47:41 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 16:29:04 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,8 +101,14 @@ void	*ft_philos(void *arg)
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
-	while (!ft_getint(&philo->dt->mut_start, &philo->dt->start))
+	while (!ft_getint(&philo->dt->mut_start, &philo->dt->start)
+			&& !ft_getint(&philo->dt->mut_fail, &philo->dt->fail))
 		usleep(20);//&& pas de probleme. Si pb alors on arrete return (NULL);
+	if (ft_getint(&philo->dt->mut_fail, &philo->dt->fail))
+	{
+		ft_exit(TH_FAIL);
+		return (NULL);
+	}
 	if (philo->dt->nphilo == 1)
 	{
 		ft_write(philo, philo->id, "has taken a fork\n");

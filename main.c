@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:53:12 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/06 16:07:08 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 16:32:21 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ int	main(int ac, char **av)
 		{
 			failed = curr;
 			curr = dt->philos;
+			ft_setint(&dt->mut_fail, &dt->fail, 1);
 			while (curr != failed)
 			{
 				pthread_join(curr->thread, NULL);
@@ -108,6 +109,7 @@ int	main(int ac, char **av)
 	{
 		failed = curr;
 		curr = dt->philos;
+		ft_setint(&dt->mut_fail, &dt->fail, 1);
 		while (curr != failed)
 		{
 			pthread_join(curr->thread, NULL);
