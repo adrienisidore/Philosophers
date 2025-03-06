@@ -6,13 +6,14 @@
 #    By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/11 11:40:55 by aisidore          #+#    #+#              #
-#    Updated: 2025/03/06 16:13:01 by aisidore         ###   ########.fr        #
+#    Updated: 2025/03/06 17:01:59 by aisidore         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 OBJ_DIR = objets
 
-SRC = ft_inidt.c \
+SRC = end.c \
+	  ft_inidt.c \
 	  main.c \
 	  ft_parser.c \
 	  setget.c \
@@ -20,7 +21,8 @@ SRC = ft_inidt.c \
 	  sim.c \
 	  utils.c
 
-OBJ = $(OBJ_DIR)/ft_inidt.o \
+OBJ = $(OBJ_DIR)/end.o \
+	  $(OBJ_DIR)/ft_inidt.o \
 	  $(OBJ_DIR)/main.o \
 	  $(OBJ_DIR)/ft_parser.o \
 	  $(OBJ_DIR)/setget.o \
@@ -28,7 +30,6 @@ OBJ = $(OBJ_DIR)/ft_inidt.o \
 	  $(OBJ_DIR)/sim.o \
 	  $(OBJ_DIR)/utils.o
 
-# FL = -Wall -Wextra -Werror -pthread -fsanitize=thread
 FL = -Wall -Wextra -Werror -pthread
 
 all: philo

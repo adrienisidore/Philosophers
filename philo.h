@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:00 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/06 16:25:33 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 16:58:47 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define PHILO_H
 
 # define PARAM_ERROR     "philo:./philo n t_die t_eat t_sleep [many_meal]\n"
-# define INV_ARG         "philo: Invalid argument(s)"
+# define INV_ARG         "philo: Invalid argument(s)\n"
 # define TMANY_PHILO     "philo: too many philosophers\n"
 # define MEM_FAIL        "philo: Memory allocation failed\n"
 # define MUT_FAIL        "philo: Mutex initialisation failed\n"
@@ -70,9 +70,11 @@ void		ft_destroy(t_mut *mut1, t_mut *mut2, t_mut *mut3, t_mut *mut4);
 int			ft_freeall(t_mut *forks, t_philo *lst_philo, t_data *dt, char *str);
 
 //ft_parser.c
+void		ft_stackdt(t_data* dt, char **av);
 char		**ft_parser(int ac, char **av);
 
 //utils.c
+void		ft_dispatch(t_philo *new_philo, t_data *dt, int j);
 size_t		ft_strlen(const char *str);
 long int	ft_atol(const char *str);
 char		*ft_ltoa(long n);

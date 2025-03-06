@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:40:44 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/06 16:25:18 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 16:55:21 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ static int	ft_checkint(const char *str, int n_arg)
 	while (ft_ispace(str[i]))
 		i++;
 	if (!(ft_isnum(str[i]) || str[i] == '+'))
-		return(ft_exit(INV_ARG));
+		return (ft_exit(INV_ARG));
 	if (str[i] == '+')
 		i++;
 	j = 0;
@@ -55,14 +55,24 @@ static int	ft_checkint(const char *str, int n_arg)
 	return (0);
 }
 
+void	ft_stackdt(t_data *dt, char **av)
+{
+	dt->nphilo = ft_atol(av[1]);
+	dt->t_die = ft_atol(av[2]);
+	dt->t_eat = ft_atol(av[3]);
+	dt->t_sleep = ft_atol(av[4]);
+	dt->start = 0;
+	dt->fail = 0;
+}
+
 char	**ft_parser(int ac, char **av)
 {
-	int i;
-	
+	int	i;
+
 	if (ac != 5 && ac != 6)
 	{
 		ft_exit(PARAM_ERROR);
-		return (NULL);	
+		return (NULL);
 	}
 	i = 0;
 	while (av[++i])
@@ -70,11 +80,6 @@ char	**ft_parser(int ac, char **av)
 		if (ft_checkint(av[i], i))
 			return (NULL);
 	}
-	// if (ft_atol(av[1]) < 1 || ft_atol(av[1]) > 200)
-	// {
-	// 	ft_exit(INV_ARG);
-	// 	return (NULL);
-	// }
 	if (ac == 6 && ft_atol(av[5]) == 0)
 		return (NULL);
 	return (av);

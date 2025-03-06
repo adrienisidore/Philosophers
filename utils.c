@@ -6,11 +6,28 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 11:41:04 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/06 16:25:53 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 16:52:42 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	ft_dispatch(t_philo *new_philo, t_data *dt, int j)
+{
+	new_philo->dt = dt;
+	new_philo->nb_meal = 0;
+	new_philo->id = j;
+	if (new_philo->id % 2 == 0)
+	{
+		new_philo->f_fork = &dt->forks[j - 1];
+		new_philo->s_fork = &dt->forks[j % dt->nphilo];
+	}
+	else
+	{
+		new_philo->s_fork = &dt->forks[j - 1];
+		new_philo->f_fork = &dt->forks[j % dt->nphilo];
+	}
+}
 
 size_t	ft_strlen(const char *str)
 {

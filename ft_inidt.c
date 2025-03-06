@@ -6,7 +6,7 @@
 /*   By: aisidore <aisidore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 13:57:39 by aisidore          #+#    #+#             */
-/*   Updated: 2025/03/06 16:25:07 by aisidore         ###   ########.fr       */
+/*   Updated: 2025/03/06 16:53:53 by aisidore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,23 +54,6 @@ static t_mut	*ft_initforks(t_data *dt)
 	return (forks);
 }
 
-static void	ft_dispatch(t_philo *new_philo, t_data *dt, int j)
-{
-	new_philo->dt = dt;
-	new_philo->nb_meal = 0;
-	new_philo->id = j;
-	if (new_philo->id % 2 == 0)
-	{
-		new_philo->f_fork = &dt->forks[j - 1];
-		new_philo->s_fork = &dt->forks[j % dt->nphilo];
-	}
-	else
-	{
-		new_philo->s_fork = &dt->forks[j - 1];
-		new_philo->f_fork = &dt->forks[j % dt->nphilo];
-	}
-}
-
 static t_philo	*ft_initphilo(t_data *dt)
 {
 	t_philo	*lst;
@@ -87,7 +70,7 @@ static t_philo	*ft_initphilo(t_data *dt)
 		{
 			pthread_mutex_destroy(&dt->mut_fail);
 			ft_freeall(dt->forks, dt->philos, dt, MEM_FAIL);
-			return (NULL);	
+			return (NULL);
 		}
 		ft_dispatch(new_philo, dt, j);
 		new_philo->next = NULL;
@@ -129,16 +112,6 @@ static int	ft_initmutex(t_data *dt)
 	return (0);
 }
 
-static void	ft_stackdt(t_data* dt, char **av)
-{
-	dt->nphilo = ft_atol(av[1]);
-	dt->t_die = ft_atol(av[2]);
-	dt->t_eat = ft_atol(av[3]);
-	dt->t_sleep = ft_atol(av[4]);
-	dt->start = 0;
-	dt->fail = 0;
-}
-
 t_data	*ft_inidt(int ac, char **av)
 {
 	t_data	*dt;
@@ -147,7 +120,7 @@ t_data	*ft_inidt(int ac, char **av)
 	if (!dt)
 	{
 		ft_exit(MEM_FAIL);
-		return (NULL);	
+		return (NULL);
 	}
 	if (pthread_mutex_init(&dt->mut_fail, NULL))
 	{
